@@ -1,0 +1,29 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1.2
+
+
+jobs:
+  build-and-test:
+    machine:
+      image: ubuntu-2004:202111-01
+    steps:
+      - checkout
+      - run: make build
+      - run: make test
+  deploy:
+    machine:
+      image: ubuntu-2004:202111-01
+    steps:
+      - checkout
+      - run: make deploy
+# Invoke jobs via workflows
+workflows:
+  main:
+    jobs:
+      - build-and-test
+      - deploy:
+          name: deploy
+          requires:
+            - build-and-test
