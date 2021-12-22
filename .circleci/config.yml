@@ -23,7 +23,7 @@ jobs:
           command: |
             apk update && apk add bash make
             environment=staging bash scripts/plan.sh
-            environment=staging bash scripts/apply.sh
+            environment=staging bash scripts/deploy.sh
   deploy-prod-plan:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
