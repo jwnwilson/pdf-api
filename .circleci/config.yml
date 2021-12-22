@@ -13,7 +13,7 @@ jobs:
       - run: make build
       - run: make test
       - run: make push
-  plan:
+  deploy-plan:
     working_directory: /tmp/project
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
@@ -27,7 +27,7 @@ jobs:
           root: .
           paths:
             - .
-  apply:
+  deploy-apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
