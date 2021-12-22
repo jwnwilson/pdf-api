@@ -21,6 +21,7 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
+            apk update && apk add bash make
             bash scripts/plan.sh
       - persist_to_workspace:
           root: .
@@ -36,6 +37,7 @@ jobs:
       - run:
           name: terraform
           command: |
+            apk update && apk add bash make
             bash scripts/deploy.sh
       - persist_to_workspace:
           root: .
