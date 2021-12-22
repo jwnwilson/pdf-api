@@ -1,22 +1,10 @@
 #! /bin/bash
 
 set -e
-set -x
+set -
 
-region="eu-west-1"
-aws_ecr="675468650888.dkr.ecr.eu-west-1.amazonaws.com"
-ecr_repo_name="pdf_service_api"
-latest_image=`docker images -q pdf-api`
-docker_tag=$(date '+%d%m%Y%H%M%S')
-
-# Docker login
-source ./scripts/docker.sh
-
-# tag and push docker image
-docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:latest"
-docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
-docker push "${aws_ecr}/${ecr_repo_name}:latest"
-docker push "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
+# Use last commit datetime as git tag
+docker_tag=$(git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S')
 
 # Deploy image to lambda
 cd infra

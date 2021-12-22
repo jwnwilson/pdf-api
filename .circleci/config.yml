@@ -12,6 +12,7 @@ jobs:
       - checkout
       - run: make build
       - run: make test
+      - run: bash ./scripts/push.sh
   deploy:
     machine:
       image: ubuntu-2004:202111-01
@@ -22,8 +23,15 @@ jobs:
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build-and-test:
+          name: build-and-test
+          branches:
+            only:
+              - main
       - deploy:
           name: deploy
           requires:
             - build-and-test
+          branches:
+          only:
+            - main
