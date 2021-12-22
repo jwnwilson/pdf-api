@@ -14,7 +14,6 @@ jobs:
       - run: make test
       - run: make push
   deploy-plan:
-    working_directory: /tmp/project
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
