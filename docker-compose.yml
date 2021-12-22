@@ -1,7 +1,7 @@
 version: '3'
 services:
   api:
-    container_name: fastapi-template-api
+    image: pdf-api
     build:
       context: .
       dockerfile: ./infra/docker/api.dockerfile

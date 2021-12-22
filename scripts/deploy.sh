@@ -6,7 +6,7 @@ set -x
 region="eu-west-1"
 aws_ecr="675468650888.dkr.ecr.eu-west-1.amazonaws.com"
 ecr_repo_name="pdf_service_api"
-latest_image=`docker images -q fastapi-template-api`
+latest_image=`docker images -q pdf-api`
 docker_tag=$(date '+%d%m%Y%H%M%S')
 
 # Docker login
