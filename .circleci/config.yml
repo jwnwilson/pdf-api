@@ -12,13 +12,35 @@ jobs:
       - checkout
       - run: make build
       - run: make test
-      - run: bash ./scripts/push.sh
-  deploy:
-    machine:
-      image: ubuntu-2004:202111-01
+      - run: make push
+  plan:
+    working_directory: /tmp/project
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
-      - run: make deploy
+      - run:
+          name: terraform init & plan
+          command: |
+            bash scripts/plan.sh
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  apply:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform
+          command: |
+            terraform apply -auto-approve tfapply
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 # Invoke jobs via workflows
 workflows:
   main:
@@ -28,10 +50,17 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy:
-          name: deploy
+      - deploy-plan:
+          name: deploy-plan
           requires:
             - build-and-test
           filters:
             branches:
               only: main
+      - deploy-approve:
+          type: approval
+          requires:
+            - plan-apply
+      - deploy-apply:
+          requires:
+            - hold-apply

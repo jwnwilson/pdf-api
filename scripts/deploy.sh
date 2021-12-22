@@ -1,11 +1,10 @@
 #! /bin/bash
 
 set -e
-set -
+set -x
 
-# Use last commit datetime as git tag
-docker_tag=$(git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S')
+source $(dirname "$0")/util.sh
 
 # Deploy image to lambda
 cd infra
-docker_tag=${docker_tag} make apply
+docker_tag=${docker_tag} environment="staging" make apply

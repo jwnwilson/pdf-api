@@ -1,18 +1,26 @@
-ENVIRONMENT:=staging
-docker_tag:=latest
+.EXPORT_ALL_VARIABLES:
+
+TF_VAR_docker_tag=${docker_tag}
+TF_VAR_ecr_api_url="675468650888.dkr.ecr.eu-west-1.amazonaws.com/pdf_service_api"
+TF_VAR_environment=${environment}
 
 init:
-	cd tf && terraform init -var-file="../${ENVIRONMENT}.tfvars"
-	cd tf_pipeline && terraform init -var-file="../${ENVIRONMENT}.tfvars"
+	cd tf && terraform init -input=false
 
 plan:
-	cd tf && terraform plan -var-file="../${ENVIRONMENT}.tfvars"
+	cd tf && terraform plan -out tfapply
 
 apply:
-	cd tf && TF_VAR_docker_tag=${docker_tag} terraform apply -var-file="../${ENVIRONMENT}.tfvars"
-
-apply_pipeline:
-	cd tf_pipeline && terraform apply -var-file="../${ENVIRONMENT}.tfvars"
+	cd tf && terraform apply -auto-approve tfapply
 
 destroy:
-	cd tf && terraform destroy -var-file="../${ENVIRONMENT}.tfvars"
+	cd tf && terraform destroy
+
+init_pipeline:
+	tf_pipeline && terraform init
+
+apply_pipeline:
+	cd tf_pipeline && terraform apply
+
+destroy_pipeline:
+	cd tf_pipeline && terraform destroy
