@@ -60,7 +60,7 @@ workflows:
       - deploy-approve:
           type: approval
           requires:
-            - plan-apply
+            - deploy-plan
       - deploy-apply:
           requires:
-            - hold-apply
+            - deploy-approve
