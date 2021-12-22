@@ -15,7 +15,7 @@ jobs:
       - run: make push
   deploy-plan:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
     steps:
       - checkout
       - run:
@@ -28,7 +28,7 @@ jobs:
             - .
   deploy-apply:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
     steps:
       - checkout
       - attach_workspace:
