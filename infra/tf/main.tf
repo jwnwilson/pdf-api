@@ -52,3 +52,12 @@ module "api_gateway" {
   lambda_name       = module.pdf_api.lambda_function_name
 
 }
+
+module "queue" {
+  source = "./modules/queue/aws"
+
+  environment       = var.environment
+  access_key        = var.access_key
+  secret_key        = var.secret_key
+  region            = var.region
+}
