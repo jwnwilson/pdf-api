@@ -13,7 +13,18 @@ jobs:
       - run: make build
       - run: make test
       - run: make push
-  deploy-plan:
+  deploy-staging:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
+    steps:
+      - checkout
+      - run:
+          name: terraform apply
+          command: |
+            apk update && apk add bash make
+            environment=staging bash scripts/plan.sh
+            environment=staging bash scripts/apply.sh
+  deploy-prod-plan:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
     steps:
@@ -22,12 +33,12 @@ jobs:
           name: terraform init & plan
           command: |
             apk update && apk add bash make
-            bash scripts/plan.sh
+            environment=production bash scripts/plan.sh
       - persist_to_workspace:
           root: .
           paths:
             - .
-  deploy-apply:
+  deploy-prod-apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:latest
     steps:
@@ -38,7 +49,7 @@ jobs:
           name: terraform
           command: |
             apk update && apk add bash make
-            bash scripts/deploy.sh
+            environment=production bash scripts/deploy.sh
       - persist_to_workspace:
           root: .
           paths:
@@ -52,17 +63,24 @@ workflows:
           filters:
             branches:
               only: main
-      - deploy-plan:
-          name: deploy-plan
+      - deploy-staging:
+          name: deploy-staging
           requires:
             - build-and-test
           filters:
             branches:
               only: main
-      - deploy-approve:
+      - deploy-prod-plan:
+          name: deploy-prod-plan
+          requires:
+            - deploy-staging
+          filters:
+            branches:
+              only: main
+      - deploy-prod-approve:
           type: approval
           requires:
-            - deploy-plan
-      - deploy-apply:
+            - deploy-prod-plan
+      - deploy-prod-apply:
           requires:
-            - deploy-approve
+            - deploy-prod-approve
