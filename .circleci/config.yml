@@ -70,10 +70,14 @@ workflows:
           filters:
             branches:
               only: main
+      - deploy-prod:
+          type: approval
+          requires:
+            - deploy-staging
       - deploy-prod-plan:
           name: deploy-prod-plan
           requires:
-            - deploy-staging
+            - deploy-prod
           filters:
             branches:
               only: main
