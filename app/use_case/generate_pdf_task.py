@@ -1,15 +1,15 @@
 from domain.task import TaskEntity
 from ports.db import DbAdapter
-from ports.pdf import PdfInData
+from ports.pdf import PdfGenerateData
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskArgs, TaskData
 
 
-def create_pdf(
+def generate_pdf_task(
     event_adapter: TaskAdapter,
     db_adapter: DbAdapter,
     storage_adapter: StorageAdapter,
-    pdf_data: PdfInData,
+    pdf_data: PdfGenerateData,
 ) -> TaskData:
     """[summary]
 
