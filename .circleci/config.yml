@@ -5,20 +5,21 @@ orbs:
 
 
 jobs:
-  test:
-    machine:
-      image: ubuntu-2004:202111-01
-    steps:
-      - checkout
-      - run: make static
-      - run: make test
   build-and-test:
     machine:
       image: ubuntu-2004:202111-01
     steps:
       - checkout
-      - run: make static
       - run: make build
+      - run: make static
+      - run: make test
+  build-and-test-push:
+    machine:
+      image: ubuntu-2004:202111-01
+    steps:
+      - checkout
+      - run: make build
+      - run: make static
       - run: make test
       - run: make push
   deploy-staging:
@@ -66,13 +67,13 @@ jobs:
 workflows:
   main:
     jobs:
-      - test:
-          name: test
+      - build-and-test:
+          name: build-and-test
           filters:
             branches:
               ignore: main
-      - build-and-test:
-          name: build-and-test
+      - build-and-test-push:
+          name: build-and-test-push
           filters:
             branches:
               only: main
