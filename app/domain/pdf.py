@@ -45,11 +45,13 @@ class PdfEntity:
         Returns:
             [type]: [description]
         """
+        pdf_file_path = f"{pdf_gen_data.pdf_uuid}/pdf.html"
+        local_pdf_file_path = f"/tmp/{pdf_file_path}"
         # get pdf data from uuid
-        pdf_data = self.get_pdf()
+        pdf_data = self.get_pdf(pdf_gen_data.pdf_uuid)
         
         # render pdf file
-        pdfkit.from_url(pdf_data.kwargs["html_url"], pdf_file_path)
+        pdfkit.from_url(pdf_data.kwargs["html_url"], local_pdf_file_path)
 
         # save pdf file
         pdf_url = self.storage_adapter.save(pdf_file_path, pdf_file_path)

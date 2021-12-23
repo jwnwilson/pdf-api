@@ -23,24 +23,25 @@ async def create_pdf_route(
     return upload_data
 
 
-@router.post("/{pdf_uuid}")
+@router.post("/{pdf_id}")
 async def generate_pdf(
-    pdf_uuid: str,
+    pdf_id: str,
     pdf_data: PdfGenerateData,
     task_adapter=Depends(get_task_adapater),
     db_adapter=Depends(get_db_adapater),
 ) -> TaskData:
+    pdf_data.pdf_id = pdf_id
     # call create use case
     pdf_task_data: TaskData = generate_pdf_task.generate_pdf_task(task_adapter, db_adapter, pdf_data)
     # return pdf id with pdf job data
     return pdf_task_data
 
 
-@router.get("/{pdf_uuid}")
+@router.get("/{pdf_id}")
 async def get_pdf(
-    pdf_uuid: str,
+    pdf_id: str,
     task_adapter=Depends(get_task_adapater),
     db_adapter=Depends(get_db_adapater),
 ) -> PdfData:
     # Attempt to get pdf data by id
-    return get_pdf_task.get_pdf(task_adapter, db_adapter, pdf_uuid)
+    return get_pdf_task.get_pdf(task_adapter, db_adapter, pdf_id)

@@ -8,11 +8,11 @@ class PdfCreateData(BaseModel):
 
 
 class PdfData(BaseModel):
-    pdf_uuid: str
+    pdf_id: str
     html_url: str
     images_urls: List[str]
 
 
 class PdfGenerateData(BaseModel):
-    pdf_uuid: str
+    pdf_id: str
     params: dict
