@@ -14,7 +14,10 @@ def get_task_adapater() -> TaskAdapter:
 
 
 def get_db_adapater() -> DbAdapter:
-    return DynamodbAdapter()
+    table_name = "pdf_generation"
+    return DynamodbAdapter(config={
+        "table_name": table_name
+    })
 
 
 def get_storage_adapater() -> StorageAdapter:

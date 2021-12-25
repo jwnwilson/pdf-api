@@ -88,3 +88,22 @@ module "pdf_worker" {
   # override docker image command to run worker handler
   image_config_command = "app.adapter.into.sqs.handler"
 }
+
+module "pdf_db" {
+  source   = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "pdf_generation"
+  hash_key = "id"
+
+  attributes = [
+    {
+      name = "id"
+      type = "N"
+    }
+  ]
+
+  tags = {
+    Terraform   = "true"
+    Environment = var.environment
+  }
+}
