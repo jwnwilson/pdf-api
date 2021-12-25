@@ -42,5 +42,5 @@ resource "aws_sqs_queue" "pdf_task_queue" {
 }
 
 output "queue_arn" {
-  value = aws_sqs_queue.pdf_task_queue.sqs_queue_arn
+  value = aws_sqs_queue.pdf_task_queue.arn
 }
