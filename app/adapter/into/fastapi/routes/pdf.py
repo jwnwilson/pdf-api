@@ -1,15 +1,20 @@
-from adapter.into.fastapi.dependencies import get_db_adapater, get_task_adapater, get_storage_adapater
+from adapter.into.fastapi.dependencies import (
+    get_db_adapater,
+    get_storage_adapater,
+    get_task_adapater,
+)
 from fastapi import APIRouter, Depends, HTTPException
-from ports.pdf import PdfGenerateData, PdfData, PdfCreateData
-from ports.task import TaskData
+from ports.pdf import PdfCreateData, PdfData, PdfGenerateData
 from ports.storage import StorageData
-from use_case import generate_pdf_task, get_pdf_task, create_pdf
+from ports.task import TaskData
+from use_case import create_pdf, generate_pdf_task, get_pdf_task
 
 router = APIRouter(
     prefix="/pdf",
     dependencies=[],
     responses={404: {"description": "Not found"}},
 )
+
 
 @router.post("/")
 async def create_pdf_route(
@@ -18,7 +23,9 @@ async def create_pdf_route(
     db_adapter=Depends(get_db_adapater),
 ) -> PdfData:
     # call create use case
-    upload_data: StorageData = create_pdf.create_pdf(storage_adapter, db_adapter, pdf_data)
+    upload_data: StorageData = create_pdf.create_pdf(
+        storage_adapter, db_adapter, pdf_data
+    )
     # return pdf id with pdf job data
     return upload_data
 
@@ -32,7 +39,9 @@ async def generate_pdf(
 ) -> TaskData:
     pdf_data.pdf_id = pdf_id
     # call create use case
-    pdf_task_data: TaskData = generate_pdf_task.generate_pdf_task(task_adapter, db_adapter, pdf_data)
+    pdf_task_data: TaskData = generate_pdf_task.generate_pdf_task(
+        task_adapter, db_adapter, pdf_data
+    )
     # return pdf id with pdf job data
     return pdf_task_data
 

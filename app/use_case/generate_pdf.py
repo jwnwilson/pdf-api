@@ -1,7 +1,7 @@
 from domain.pdf import PdfEntity
 from ports.db import DbAdapter
-from ports.storage import StorageAdapter
 from ports.pdf import PdfData
+from ports.storage import StorageAdapter
 
 
 def generate_pdf(

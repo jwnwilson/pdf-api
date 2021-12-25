@@ -2,6 +2,7 @@ from abc import ABC
 
 from pydantic import BaseModel
 
+
 class StorageData(BaseModel):
     path: str
     upload_url: str
