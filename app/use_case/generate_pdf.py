@@ -4,7 +4,7 @@ from ports.pdf import PdfData
 from ports.storage import StorageAdapter
 
 
-def create_pdf(
+def generate_pdf(
     db_adapter: DbAdapter, storage_adapter: StorageAdapter, pdf_data: PdfData
 ):
     """[summary]
@@ -18,5 +18,5 @@ def create_pdf(
     """
     # create pdf
     pdf_entity = PdfEntity(db_adapter=db_adapter, storage_adapter=storage_adapter)
-    task_data = pdf_entity.create_pdf(PdfData)
+    task_data = pdf_entity.generate_pdf(PdfData)
     return task_data

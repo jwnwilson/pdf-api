@@ -61,3 +61,49 @@ module "queue" {
   aws_secret_key        = var.aws_secret_key
   region                = var.region
 }
+
+resource "aws_lambda_event_source_mapping" "sqs" {
+  event_source_arn = module.queue.queue_arn
+  function_name    = module.pdf_worker.lambda_function_name
+}
+
+module "pdf_worker" {
+  source                  = "terraform-aws-modules/lambda/aws"
+
+  function_name           = "pdf_worker_${var.environment}"
+  description             = "PDF creator worker"
+
+  create_package          = false
+
+  image_uri               = "${var.ecr_api_url}:${var.docker_tag}"
+  package_type            = "Image"
+  vpc_subnet_ids          = module.vpc.intra_subnets
+  vpc_security_group_ids  = [module.vpc.default_security_group_id]
+  attach_network_policy   = true
+
+  environment_variables = {
+    ENVIRONMENT = var.environment
+  }
+
+  # override docker image command to run worker handler
+  image_config_command = "app.adapter.into.sqs.handler"
+}
+
+module "pdf_db" {
+  source   = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "pdf_generation"
+  hash_key = "id"
+
+  attributes = [
+    {
+      name = "id"
+      type = "N"
+    }
+  ]
+
+  tags = {
+    Terraform   = "true"
+    Environment = var.environment
+  }
+}
