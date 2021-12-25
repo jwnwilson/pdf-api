@@ -3,7 +3,7 @@ import boto3
 
 from infrastructure.db import DynamodbAdapter
 from infrastructure.storage import S3Adapter
-from use_case import create_pdf
+from use_case import 
 from ports.pdf import PdfData
 
 

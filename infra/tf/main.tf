@@ -84,4 +84,7 @@ module "pdf_worker" {
   environment_variables = {
     ENVIRONMENT = var.environment
   }
+
+  # override docker image command to run worker handler
+  image_config_command = "app.adapter.into.sqs.handler"
 }
