@@ -40,3 +40,7 @@ resource "aws_sqs_queue" "pdf_task_queue" {
     Environment = var.environment
   }
 }
+
+output "queue_arn" {
+  value = aws_sqs_queue.pdf_task_queue.sqs_queue_arn
+}
