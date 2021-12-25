@@ -82,7 +82,7 @@ workflows:
       - deploy-staging:
           name: deploy-staging
           requires:
-            - build-and-test
+            - build-and-test-push
           filters:
             branches:
               only: main
