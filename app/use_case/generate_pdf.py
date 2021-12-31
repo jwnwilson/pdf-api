@@ -1,12 +1,12 @@
 from domain.pdf import PdfEntity
 from ports.db import DbAdapter
-from ports.pdf import PdfData
+from ports.pdf import PdfData, PdfGenerateData
 from ports.storage import StorageAdapter
 
 
 def generate_pdf(
     db_adapter: DbAdapter, storage_adapter: StorageAdapter, pdf_data: PdfData
-):
+) -> PdfGenerateData:
     """[summary]
 
     Args:

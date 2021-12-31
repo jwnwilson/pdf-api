@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ class PdfCreateData(BaseModel):
 
 
 class PdfData(BaseModel):
-    pdf_id: str
+    pdf_id: Optional[str]
     html_url: str
     images_urls: List[str]
 

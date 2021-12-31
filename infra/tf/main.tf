@@ -107,3 +107,28 @@ module "pdf_db" {
     Environment = var.environment
   }
 }
+
+resource "aws_iam_policy" "sqs-lambda-policy" {
+  name        = "sqs-lambda-policy"
+  description = "lambda sqs policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sqs:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "sqs-attach" {
+  role       = module.pdf_worker.lambda_role_name
+  policy_arn = aws_iam_policy.sqs-lambda-policy.arn
+}

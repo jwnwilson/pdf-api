@@ -17,3 +17,20 @@ services:
     # Override lambda entry point to revert to default docker behaviour
     entrypoint: ""
     command: "uvicorn app.adapter.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload"
+
+  worker:
+    image: pdf-api
+    build:
+      context: .
+      dockerfile: ./infra/docker/api.dockerfile
+    tty: true
+    volumes:
+      - ./app:/var/task/app
+      - ./scripts:/var/task/scripts
+      - ./mypy.ini:/var/task/mypy.ini
+    expose:
+      - "9000"
+    ports:
+      - 0.0.0.0:9000:8080
+    command: "app.adapter.into.sqs.handler.pdf_generator_lambda_handler"
+
