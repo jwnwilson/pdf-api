@@ -1,5 +1,6 @@
 import re
 import uuid
+import logging
 
 import pdfkit
 import requests
@@ -7,6 +8,8 @@ from ports.db import DbAdapter
 from ports.pdf import PdfData, PdfGenerateData
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskData
+
+logger = logging.getLogger(__name__)
 
 
 class PdfEntity:
@@ -67,11 +70,14 @@ class PdfEntity:
         return PdfGenerateData(pdf_id=pdf_id)
 
     def get_pdf(self, uuid: str) -> PdfData:
+        logger.info(f"Getting pdf data: {uuid}")
         # Get image files from storage
-        files = self.storage_adapter.list(uuid)
+        path = f"{uuid}/"
+        files = self.storage_adapter.list(path)
         html_path = files.filter(lambda x: x.endswith("html"))[0]
         image_urls = files.filter(lambda x: not x.endswith("html"))
 
+        logger.info(f"Got pdf data: {uuid}")
         return PdfData(pdf_uuid=uuid, html_path=html_path, image_urls=image_urls)
 
     def generate_pdf(self, pdf_gen_data: PdfGenerateData) -> PdfGenerateData:
@@ -85,19 +91,26 @@ class PdfEntity:
             [type]: [description]
         """
         # get pdf data from uuid
-        pdf_data = self.get_pdf(pdf_gen_data.pdf_uuid)
+        pdf_data = self.get_pdf(pdf_gen_data.pdf_id)
 
         # render pdf file
-        pdf_file_path = f"{pdf_gen_data.pdf_uuid}/render.pdf"
+        pdf_file_path = f"{pdf_gen_data.pdf_id}/render.pdf"
         local_pdf_file_path = f"/tmp/{pdf_file_path}"
+
+        logger.info(f"Rendering PDF {uuid}")
         pdfkit.from_url(pdf_data.kwargs["html_url"], local_pdf_file_path)
+        logger.info(f"Rendered PDF {uuid}")
 
         # save pdf file
+        logger.info(f"Saving PDF {uuid} to storage")
         pdf_url = self.storage_adapter.save(pdf_file_path, pdf_file_path)
         pdf_data.result = pdf_url
         pdf_data.status = "Complete"
+        logger.info(f"Saved PDF {uuid} to storage")
 
         # update db record
+        logger.info(f"Updating PDF {uuid} DB record")
         self.db_adapter.update(pdf_data.task_id, pdf_data)
+        logger.info(f"Updated PDF {uuid} DB record")
 
         return pdf_data

@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 from pydantic import BaseModel
 
@@ -11,6 +12,9 @@ class StorageData(BaseModel):
 class StorageAdapter(ABC):
     def __init__(self) -> None:
         pass
+
+    def list(self) -> List[str]:
+        raise NotImplementedError
 
     def upload_url(self) -> StorageData:
         raise NotImplementedError

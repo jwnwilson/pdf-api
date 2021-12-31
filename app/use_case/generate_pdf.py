@@ -18,5 +18,5 @@ def generate_pdf(
     """
     # create pdf
     pdf_entity = PdfEntity(db_adapter=db_adapter, storage_adapter=storage_adapter)
-    task_data = pdf_entity.generate_pdf(PdfData)
+    task_data = pdf_entity.generate_pdf(pdf_data)
     return task_data

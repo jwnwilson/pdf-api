@@ -6,10 +6,14 @@ services:
       context: .
       dockerfile: ./infra/docker/api.dockerfile
     tty: true
+    env_file:
+      - .env
     volumes:
       - ./app:/var/task/app
       - ./scripts:/var/task/scripts
       - ./mypy.ini:/var/task/mypy.ini
+      # For local auth with aws, assuming credential file exists
+      - $HOME/.aws/credentials:/root/.aws/credentials:ro
     expose:
       - "80"
     ports:
@@ -24,10 +28,14 @@ services:
       context: .
       dockerfile: ./infra/docker/api.dockerfile
     tty: true
+    env_file:
+      - .env
     volumes:
       - ./app:/var/task/app
       - ./scripts:/var/task/scripts
       - ./mypy.ini:/var/task/mypy.ini
+      # For local auth with aws, assuming credential file exists
+      - $HOME/.aws/credentials:/root/.aws/credentials:ro
     expose:
       - "9000"
     ports:
