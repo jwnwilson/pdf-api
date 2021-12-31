@@ -1,4 +1,5 @@
 import json
+import os
 import logging
 from typing import List
 import traceback
@@ -11,6 +12,8 @@ from use_case import generate_pdf
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 
 def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
@@ -31,8 +34,8 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
             )
             logger.info(f"PDF data {i} parsed from SQS, generating PDF")
             
-            db_adapter = DynamodbAdapter({"table": "pdf_generation"})
-            storage_adapter = S3Adapter({"bucket": "pdf_generation"})
+            db_adapter = DynamodbAdapter({"table": f"pdf_generation_{ENVIRONMENT}"})
+            storage_adapter = S3Adapter({"bucket": f"pdf_generation_{ENVIRONMENT}"})
             logger.info(f"PDF generating {i}")
             task_data = generate_pdf.generate_pdf(db_adapter, storage_adapter, pdf_data)
             logger.info(f"PDF generated {i}")

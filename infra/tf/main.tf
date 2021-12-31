@@ -92,7 +92,7 @@ module "pdf_worker" {
 module "pdf_db" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "pdf_generation"
+  name     = "pdf_generation_${var.environment}"
   hash_key = "id"
 
   attributes = [
@@ -108,9 +108,9 @@ module "pdf_db" {
   }
 }
 
-resource "aws_iam_policy" "sqs-lambda-policy" {
-  name        = "sqs-lambda-policy"
-  description = "lambda sqs policy"
+resource "aws_iam_policy" "sqs-s3-lambda-policy" {
+  name        = "sqs-s3-lambda-policy-${var.environment}"
+  description = "lambda sqs s3 policy"
 
   policy = <<EOF
 {
@@ -122,6 +122,18 @@ resource "aws_iam_policy" "sqs-lambda-policy" {
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+        "Sid": "ListObjectsInBucket",
+        "Effect": "Allow",
+        "Action": ["s3:ListBucket"],
+        "Resource": ["arn:aws:s3:::pdf_generation_${var.environment}"]
+    },
+    {
+        "Sid": "AllObjectActions",
+        "Effect": "Allow",
+        "Action": "s3:*Object",
+        "Resource": ["arn:aws:s3:::pdf_generation_${var.environment}/*"]
     }
   ]
 }
@@ -131,4 +143,14 @@ EOF
 resource "aws_iam_role_policy_attachment" "sqs-attach" {
   role       = module.pdf_worker.lambda_role_name
   policy_arn = aws_iam_policy.sqs-lambda-policy.arn
+}
+
+resource "aws_s3_bucket" "pdf_storage" {
+  bucket = "pdf_generation_${var.environment}"
+  acl    = "private"
+
+  tags = {
+    Name        = "Pdf generation bucket${var.environment} "
+    Environment = var.environment
+  }
 }
