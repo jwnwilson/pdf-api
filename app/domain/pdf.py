@@ -1,6 +1,7 @@
 import re
 import uuid
 import logging
+import os
 
 import pdfkit
 import requests
@@ -74,11 +75,17 @@ class PdfEntity:
         # Get image files from storage
         path = f"{uuid}/"
         files = self.storage_adapter.list(path)
-        html_path = files.filter(lambda x: x.endswith("html"))[0]
-        image_urls = files.filter(lambda x: not x.endswith("html"))
+        try:
+            html_path = [x for x in files if x.endswith("html")][0]
+            image_urls = [x for x in files if not x.endswith("html")]
+        except IndexError:
+            logger.error(f"Unable to find html file for pdf: {uuid}")
+            raise
 
         logger.info(f"Got pdf data: {uuid}")
-        return PdfData(pdf_uuid=uuid, html_path=html_path, image_urls=image_urls)
+        logger.info(f"Html pdf data: {html_path}")
+        logger.info(f"Image pdf data: {image_urls}")
+        return PdfData(pdf_id=uuid, html_url=html_path, image_urls=image_urls)
 
     def generate_pdf(self, pdf_gen_data: PdfGenerateData) -> PdfGenerateData:
         """[summary]
@@ -94,23 +101,26 @@ class PdfEntity:
         pdf_data = self.get_pdf(pdf_gen_data.pdf_id)
 
         # render pdf file
-        pdf_file_path = f"{pdf_gen_data.pdf_id}/render.pdf"
-        local_pdf_file_path = f"/tmp/{pdf_file_path}"
+        local_file_folder = f"/tmp/{pdf_gen_data.pdf_id}"
+        local_file_path = local_file_folder + "/render.pdf"
+        if not os.path.exists(local_file_folder):
+            os.makedirs(local_file_folder)
 
-        logger.info(f"Rendering PDF {uuid}")
-        pdfkit.from_url(pdf_data.kwargs["html_url"], local_pdf_file_path)
-        logger.info(f"Rendered PDF {uuid}")
+        logger.info(f"Rendering PDF {pdf_gen_data.pdf_id}")
+        pdfkit.from_url(pdf_data.html_url, local_file_path)
+        logger.info(f"Rendered PDF {pdf_gen_data.pdf_id}")
 
         # save pdf file
-        logger.info(f"Saving PDF {uuid} to storage")
-        pdf_url = self.storage_adapter.save(pdf_file_path, pdf_file_path)
-        pdf_data.result = pdf_url
+        logger.info(f"Saving PDF {pdf_gen_data.pdf_id} to storage")
+        pdf_file_path = f"{pdf_gen_data.pdf_id}/render.html"
+        pdf_url = self.storage_adapter.save(local_file_path, pdf_file_path)
+        pdf_data.pdf_url = pdf_url
         pdf_data.status = "Complete"
-        logger.info(f"Saved PDF {uuid} to storage")
+        logger.info(f"Saved PDF {pdf_gen_data.pdf_id} to storage")
 
         # update db record
-        logger.info(f"Updating PDF {uuid} DB record")
+        logger.info(f"Updating PDF {pdf_gen_data.pdf_id} DB record")
         self.db_adapter.update(pdf_data.task_id, pdf_data)
-        logger.info(f"Updated PDF {uuid} DB record")
+        logger.info(f"Updated PDF {pdf_gen_data.pdf_id} DB record")
 
         return pdf_data

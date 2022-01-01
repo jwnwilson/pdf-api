@@ -7,11 +7,11 @@ import traceback
 
 from infrastructure.db import DynamodbAdapter
 from infrastructure.storage import S3Adapter
-from ports.pdf import PdfData, PdfGenerateData
+from ports.pdf import PdfGenerateData
 from use_case import generate_pdf
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
@@ -27,18 +27,18 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
         i = i + 1
         try:
             logger.info(f"Processing record {i} from SQS")
-            # Parse event data
+            # Get pdf uuid to fetch files
             pdf_gen_data = json.loads(record["body"])
-            pdf_data = PdfData(
-                html_url=pdf_gen_data["html_url"], images_urls=pdf_gen_data["image_urls"]
+            pdf_data = PdfGenerateData(
+                pdf_id=pdf_gen_data["pdf_id"],
+                params=pdf_gen_data["params"]
             )
-            logger.info(f"PDF data {i} parsed from SQS, generating PDF")
-            
+
+            logger.info(f"PDF id:{pdf_data.pdf_id} parsed from SQS, generating PDF")
             db_adapter = DynamodbAdapter({"table": f"pdf_generation_{ENVIRONMENT}"})
-            storage_adapter = S3Adapter({"bucket": f"pdf_generation_{ENVIRONMENT}"})
-            logger.info(f"PDF generating {i}")
+            storage_adapter = S3Adapter({"bucket": f"jwnwilson-pdf-generation-{ENVIRONMENT}"})
             task_data = generate_pdf.generate_pdf(db_adapter, storage_adapter, pdf_data)
-            logger.info(f"PDF generated {i}")
+            logger.info(f"PDF generated {pdf_data.pdf_id}")
 
             tasks_data.append(task_data)
         except Exception as err:

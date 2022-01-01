@@ -142,11 +142,11 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "sqs-attach" {
   role       = module.pdf_worker.lambda_role_name
-  policy_arn = aws_iam_policy.sqs-lambda-policy.arn
+  policy_arn = aws_iam_policy.sqs-s3-lambda-policy.arn
 }
 
 resource "aws_s3_bucket" "pdf_storage" {
-  bucket = "pdf_generation_${var.environment}"
+  bucket = "jwnwilson-pdf-generation-${var.environment}"
   acl    = "private"
 
   tags = {

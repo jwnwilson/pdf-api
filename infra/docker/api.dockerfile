@@ -1,7 +1,9 @@
 FROM public.ecr.aws/lambda/python:3.8
 
 # Install libraries
-RUN yum install -y libpng \
+RUN yum install -y \
+    which \
+    libpng \
     libjpeg \
     openssl \
     icu \

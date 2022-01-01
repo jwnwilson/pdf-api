@@ -9,9 +9,11 @@ class PdfCreateData(BaseModel):
 
 
 class PdfData(BaseModel):
-    pdf_id: Optional[str]
+    pdf_id: str
     html_url: str
-    images_urls: List[str]
+    images_urls: Optional[List[str]]
+    pdf_url: Optional[str]
+    status: Optional[str]
 
 
 class PdfGenerateData(BaseModel):

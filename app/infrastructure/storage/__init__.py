@@ -14,7 +14,8 @@ class S3Adapter(StorageAdapter):
         pass
 
     def list(self, path:str) -> List[str]:
-        return [b.key for b in self.bucket.objects.filter(Prefix=path)]
+        url = f'https://{self.bucket_name}.s3.amazonaws.com/'
+        return [url + obj.key for obj in self.bucket.objects.filter(Prefix=path)]
 
     def save(self, source_path: str, target_path: str):
         pass
