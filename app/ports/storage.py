@@ -1,12 +1,12 @@
 from abc import ABC
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
 class StorageData(BaseModel):
     path: str
-    upload_url: str
+    upload_url: Optional[str]
 
 
 class StorageAdapter(ABC):

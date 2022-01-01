@@ -112,15 +112,15 @@ class PdfEntity:
 
         # save pdf file
         logger.info(f"Saving PDF {pdf_gen_data.pdf_id} to storage")
-        pdf_file_path = f"{pdf_gen_data.pdf_id}/render.html"
-        pdf_url = self.storage_adapter.save(local_file_path, pdf_file_path)
-        pdf_data.pdf_url = pdf_url
+        pdf_file_path = f"{pdf_gen_data.pdf_id}/render.pdf"
+        storage_data = self.storage_adapter.save(local_file_path, pdf_file_path)
+        pdf_data.pdf_url = storage_data.path
         pdf_data.status = "Complete"
         logger.info(f"Saved PDF {pdf_gen_data.pdf_id} to storage")
 
         # update db record
         logger.info(f"Updating PDF {pdf_gen_data.pdf_id} DB record")
-        self.db_adapter.update(pdf_data.task_id, pdf_data)
+        self.db_adapter.create(pdf_data.dict())
         logger.info(f"Updated PDF {pdf_gen_data.pdf_id} DB record")
 
-        return pdf_data
+        return pdf_data.dict()

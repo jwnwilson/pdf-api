@@ -93,12 +93,12 @@ module "pdf_db" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
   name     = "pdf_generation_${var.environment}"
-  hash_key = "id"
+  hash_key = "pdf_id"
 
   attributes = [
     {
-      name = "id"
-      type = "N"
+      name = "pdf_id"
+      type = "S"
     }
   ]
 
