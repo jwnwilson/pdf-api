@@ -5,6 +5,8 @@ import os
 
 import pdfkit
 import requests
+from jinja2 import Environment, FileSystemLoader
+
 from ports.db import DbAdapter
 from ports.pdf import PdfData, PdfGenerateData
 from ports.storage import StorageAdapter
@@ -87,6 +89,34 @@ class PdfEntity:
         logger.info(f"Image pdf data: {image_urls}")
         return PdfData(pdf_id=uuid, html_url=html_path, image_urls=image_urls)
 
+    def generate_html(self, template_url: str, params: dict) -> str:
+        """[summary]
+
+        Args:
+            pdf_data (PdfData): [description]
+
+        Returns:
+            str: [description]
+        """
+        # Save html template data to file
+        html_template_path = "/tmp/template.html"
+        html_generated_path = "/tmp/generated.html"
+        html_template_data = requests.get(template_url)
+        # save html template
+        with open(html_template_path, "w") as fh:
+            fh.write(html_template_data.content)
+
+        jinja_env = Environment(loader=FileSystemLoader('templates'))
+        template = jinja_env.get_template(html_template_path)
+        output_from_parsed_template = template.render(**params)
+
+        # save generated html
+        with open(html_generated_path, "w") as fh:
+            fh.write(output_from_parsed_template)
+
+        return html_generated_path
+
+    
     def generate_pdf(self, pdf_gen_data: PdfGenerateData) -> PdfGenerateData:
         """[summary]
 
@@ -100,14 +130,18 @@ class PdfEntity:
         # get pdf data from uuid
         pdf_data = self.get_pdf(pdf_gen_data.pdf_id)
 
-        # render pdf file
+        # generate html from template + parameters
+        html_path = self.generate_html(pdf_data.html_url, pdf_gen_data.params)
+
+        # Create local folders if needed       
         local_file_folder = f"/tmp/{pdf_gen_data.pdf_id}"
         local_file_path = local_file_folder + "/render.pdf"
         if not os.path.exists(local_file_folder):
             os.makedirs(local_file_folder)
 
+        # Render pdf file
         logger.info(f"Rendering PDF {pdf_gen_data.pdf_id}")
-        pdfkit.from_url(pdf_data.html_url, local_file_path)
+        pdfkit.from_file(html_path, local_file_path)
         logger.info(f"Rendered PDF {pdf_gen_data.pdf_id}")
 
         # save pdf file
