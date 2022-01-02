@@ -1,8 +1,11 @@
+import logging
 from typing import Any, List
 
 from ports.db import DbAdapter
 from ports.task import TaskAdapter, TaskArgs, TaskData
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 class RegisteredTask(BaseModel):
@@ -22,8 +25,9 @@ class TaskEntity:
         # Create task in event adapter
         task_data: TaskData = self.event_adapter.create_task(task_args)
         # Store task id in db
-        print("task_data.dict()", task_data.dict())
+        logger.info(f"Storing task data in DB: {task_data.task_id}")
         self.db_adapter.create(task_data.dict())
+        logger.info(f"Stored task data in DB: {task_data.task_id}")
         return task_data
 
     def get_task_from_queue(self):

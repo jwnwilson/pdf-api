@@ -22,11 +22,13 @@ class SqsTaskAdapter(TaskAdapter):
             kwargs=task_args.kwargs,
             status="Pending",
         )
+
+        logger.info(f"Creating task: {task_data.task_id}")
         sqs_resp = self.sqs.send_message(
             QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data.dict()))
         )
         sqs_id = sqs_resp["MessageId"]
-        logger.info(f"Created SQS event with id: {sqs_id}")
+        logger.info(f"Created task: {task_data.task_id} SQS event with id: {sqs_id}")
 
         return task_data
 
