@@ -8,7 +8,6 @@ from ports.task import TaskAdapter, TaskArgs, TaskData
 def generate_pdf_task(
     event_adapter: TaskAdapter,
     db_adapter: DbAdapter,
-    storage_adapter: StorageAdapter,
     pdf_data: PdfGenerateData,
 ) -> TaskData:
     """[summary]
@@ -20,13 +19,9 @@ def generate_pdf_task(
     Returns:
         [type]: [description]
     """
-    # store html data to create pdf later
-    html_file = pdf_data.html_url.split("/")[-1]
-    html_url = storage_adapter.save(pdf_data.html_url, html_file)
-
     # create pdf task
     task_service = TaskEntity(event_adapter=event_adapter, db_adapter=db_adapter)
-    task_args = TaskArgs(task_name="create_pdf", kwargs={"html_url": html_url})
+    task_args = TaskArgs(task_name="create_pdf", kwargs=pdf_data.dict())
     pdf_task_data = task_service.create_task(task_args)
 
     # return pdf task data

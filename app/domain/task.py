@@ -21,10 +21,10 @@ class TaskEntity:
     def create_task(self, task_args: TaskArgs) -> TaskData:
         # Create task in event adapter
         task_data: TaskData = self.event_adapter.create_task(
-            task_name=task_args.task_name, task_args=task_args
+            task_args
         )
         # Store task id in db
-        self.db_adapter.create(task_data)
+        self.db_adapter.create(task_args.dict())
         return task_data
 
     def get_task_from_queue(self):

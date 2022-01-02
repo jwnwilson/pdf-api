@@ -1,7 +1,11 @@
 import json
+import uuid
+import logging
 
 import boto3
 from ports.task import TaskAdapter, TaskArgs, TaskData
+
+logger = logging.getLogger(__name__)
 
 
 class SqsTaskAdapter(TaskAdapter):
@@ -10,16 +14,21 @@ class SqsTaskAdapter(TaskAdapter):
         self.sqs = boto3.client("sqs")
         self.queue_url = config["queue"]
 
-    def create_task(self, task_name: str, task_args: TaskArgs) -> TaskData:
+    def create_task(self, task_args: TaskArgs) -> TaskData:
         # Send message to SQS queue
-        task_data = {"task_name": task_name, "task_args": task_args.dict()}
-        sqs_resp = self.sqs.send_message(
-            QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data))
+        task_data = TaskData(
+            task_id=uuid.uuid4(),
+            task_name=task_args.task_name,
+            kwargs=task_args.kwargs,
+            status="Pending"
         )
-
-        resp = TaskData(task_id=sqs_resp["MessageId"], status="pending", data=sqs_resp)
-
-        return resp
+        sqs_resp = self.sqs.send_message(
+            QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data.dict()))
+        )
+        sqs_id = sqs_resp["MessageId"]
+        logger.info(f"Created SQS event with id: {sqs_id}")
+    
+        return task_data
 
     def get_task(self) -> TaskData:
         # Get a message from sqs queue

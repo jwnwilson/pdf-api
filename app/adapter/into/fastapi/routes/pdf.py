@@ -1,3 +1,5 @@
+import uuid
+
 from adapter.into.fastapi.dependencies import (
     get_db_adapater,
     get_storage_adapater,
@@ -33,11 +35,15 @@ async def create_pdf_route(
 @router.post("/{pdf_id}")
 async def generate_pdf(
     pdf_id: str,
-    pdf_data: PdfGenerateData,
+    pdf_params: dict,
     task_adapter=Depends(get_task_adapater),
     db_adapter=Depends(get_db_adapater),
 ) -> TaskData:
-    pdf_data.pdf_id = pdf_id
+    pdf_data = PdfGenerateData(
+       pdf_id=pdf_id,
+       params=pdf_params,
+       status="Pending"
+    )
     # call create use case
     pdf_task_data: TaskData = generate_pdf_task.generate_pdf_task(
         task_adapter, db_adapter, pdf_data

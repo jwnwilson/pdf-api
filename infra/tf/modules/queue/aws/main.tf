@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_sqs_queue" "pdf_task_queue_deadletter" {
-  name                      = "pdf_task_queue_deadletter"
+  name                      = "pdf_task_queue_deadletter_${var.environment}"
   delay_seconds             = 90
   max_message_size          = 2048
   message_retention_seconds = 86400
@@ -26,7 +26,7 @@ resource "aws_sqs_queue" "pdf_task_queue_deadletter" {
 }
 
 resource "aws_sqs_queue" "pdf_task_queue" {
-  name                      = "pdf_task_queue"
+  name                      = "pdf_task_queue_${var.environment}"
   delay_seconds             = 90
   max_message_size          = 2048
   message_retention_seconds = 86400

@@ -16,7 +16,7 @@ class PdfData(BaseModel):
 
 class PdfGenerateData(BaseModel):
     pdf_id: str
-    task_id: str
+    task_id: Optional[str]
     params: Optional[dict]
     pdf_url: Optional[str]
     status: Optional[str]
