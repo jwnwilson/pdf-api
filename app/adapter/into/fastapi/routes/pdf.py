@@ -1,4 +1,4 @@
-import uuid
+import logging
 
 from adapter.into.fastapi.dependencies import (
     get_db_adapater,
@@ -10,6 +10,8 @@ from ports.pdf import PdfCreateData, PdfData, PdfGenerateData
 from ports.storage import StorageData
 from ports.task import TaskArgs, TaskData
 from use_case import create_pdf, generate_pdf_task, get_pdf_task
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/pdf",
@@ -41,6 +43,8 @@ async def generate_pdf(
 ) -> TaskData:
     pdf_params["pdf_id"] = pdf_id
     pdf_data = TaskArgs(task_name="generate_pdf", kwargs=pdf_params)
+    
+    logger.info(f"Generating PDF: {pdf_id}")
     # call create use case
     pdf_task_data: TaskData = generate_pdf_task.generate_pdf_task(
         task_adapter, db_adapter, pdf_data
