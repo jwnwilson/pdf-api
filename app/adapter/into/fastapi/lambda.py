@@ -1,4 +1,5 @@
 import logging
+
 from mangum import Mangum
 
 # Initialize you log configuration using the base class
