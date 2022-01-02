@@ -16,7 +16,7 @@ def get_task_adapater() -> TaskAdapter:
 
 
 def get_db_adapater() -> DbAdapter:
-    table_name = f"pdf_generation_{ENVIRONMENT}"
+    table_name = f"pdf_task_{ENVIRONMENT}"
     return DynamodbAdapter(config={"table": table_name})
 
 

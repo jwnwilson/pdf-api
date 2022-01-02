@@ -17,7 +17,7 @@ class SqsTaskAdapter(TaskAdapter):
     def create_task(self, task_args: TaskArgs) -> TaskData:
         # Send message to SQS queue
         task_data = TaskData(
-            task_id=uuid.uuid4(),
+            task_id=str(uuid.uuid4()),
             task_name=task_args.task_name,
             kwargs=task_args.kwargs,
             status="Pending"

@@ -10,7 +10,7 @@ class TaskArgs(BaseModel):
 
 
 class TaskData(BaseModel):
-    task_id: int
+    task_id: str
     task_name: str
     kwargs: dict
     status: str

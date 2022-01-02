@@ -24,7 +24,8 @@ class TaskEntity:
             task_args
         )
         # Store task id in db
-        self.db_adapter.create(task_args.dict())
+        print("task_data.dict()", task_data.dict())
+        self.db_adapter.create(task_data.dict())
         return task_data
 
     def get_task_from_queue(self):
