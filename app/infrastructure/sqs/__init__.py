@@ -1,6 +1,6 @@
 import json
-import uuid
 import logging
+import uuid
 
 import boto3
 from ports.task import TaskAdapter, TaskArgs, TaskData
@@ -20,14 +20,14 @@ class SqsTaskAdapter(TaskAdapter):
             task_id=str(uuid.uuid4()),
             task_name=task_args.task_name,
             kwargs=task_args.kwargs,
-            status="Pending"
+            status="Pending",
         )
         sqs_resp = self.sqs.send_message(
             QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data.dict()))
         )
         sqs_id = sqs_resp["MessageId"]
         logger.info(f"Created SQS event with id: {sqs_id}")
-    
+
         return task_data
 
     def get_task(self) -> TaskData:

@@ -1,12 +1,11 @@
-import re
-import uuid
 import logging
 import os
+import re
+import uuid
 
 import pdfkit
 import requests
 from jinja2 import Environment, FileSystemLoader
-
 from ports.db import DbAdapter
 from ports.pdf import PdfData, PdfGenerateData
 from ports.storage import StorageAdapter
@@ -16,7 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 class PdfEntity:
-    def __init__(self, db_adapter: DbAdapter, template_storage_adapter: StorageAdapter, task_storage_adapter: StorageAdapter):
+    def __init__(
+        self,
+        db_adapter: DbAdapter,
+        template_storage_adapter: StorageAdapter,
+        task_storage_adapter: StorageAdapter,
+    ):
         self.db_adapter = db_adapter
         self.template_storage_adapter = template_storage_adapter
         self.task_storage_adapter = task_storage_adapter
@@ -62,13 +66,18 @@ class PdfEntity:
 
         # Download html and save in storage
         html_path = self._save_url_to_file(
-            self.template_storage_adapter, pdf_id, pdf_data.html_url, file_name="template.html"
+            self.template_storage_adapter,
+            pdf_id,
+            pdf_data.html_url,
+            file_name="template.html",
         )
 
         # Download images and save in storage
         image_urls = []
         for image_url in pdf_data.images_urls:
-            image_urls.append(self._save_url_to_file(self.template_storage_adapter, pdf_id, image_url))
+            image_urls.append(
+                self._save_url_to_file(self.template_storage_adapter, pdf_id, image_url)
+            )
 
         # Return pdf data
         return PdfGenerateData(pdf_id=pdf_id)
@@ -107,7 +116,7 @@ class PdfEntity:
         with open(html_template_path, "w") as fh:
             fh.write(html_template_data.text)
 
-        jinja_env = Environment(loader=FileSystemLoader('/tmp'))
+        jinja_env = Environment(loader=FileSystemLoader("/tmp"))
         template = jinja_env.get_template("template.html")
         output_from_parsed_template = template.render(**params)
 
@@ -117,7 +126,6 @@ class PdfEntity:
 
         return html_generated_path
 
-    
     def generate_pdf(self, pdf_gen_data: PdfGenerateData) -> PdfGenerateData:
         """[summary]
 
@@ -135,7 +143,7 @@ class PdfEntity:
         # generate html from template + parameters
         html_path = self.generate_html(pdf_data.html_url, pdf_gen_data.params)
 
-        # Create local folders if needed       
+        # Create local folders if needed
         local_file_folder = f"/tmp/"
         local_file_path = local_file_folder + "render.pdf"
 
@@ -153,7 +161,7 @@ class PdfEntity:
         # update task db record
         pdf_gen_data.pdf_url = storage_data.path
         pdf_gen_data.status = "Complete"
-        
+
         logger.info(f"Updating PDF task: {task_id} DB record")
         self.db_adapter.create(pdf_gen_data.dict())
         logger.info(f"Updated PDF task: {task_id} DB record")
