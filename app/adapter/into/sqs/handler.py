@@ -31,13 +31,15 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
             pdf_gen_data = json.loads(record["body"])
             pdf_data = PdfGenerateData(
                 pdf_id=pdf_gen_data["pdf_id"],
-                params=pdf_gen_data["params"]
+                params=pdf_gen_data["params"],
+                task_id=pdf_gen_data["task_id"]
             )
 
             logger.info(f"PDF id:{pdf_data.pdf_id} parsed from SQS, generating PDF")
-            db_adapter = DynamodbAdapter({"table": f"pdf_generation_{ENVIRONMENT}"})
-            storage_adapter = S3Adapter({"bucket": f"jwnwilson-pdf-generation-{ENVIRONMENT}"})
-            task_data = generate_pdf.generate_pdf(db_adapter, storage_adapter, pdf_data)
+            db_adapter = DynamodbAdapter({"table": f"pdf_task_{ENVIRONMENT}"})
+            pdf_storage_adapter = S3Adapter({"bucket": f"jwnwilson-pdf-task-{ENVIRONMENT}"})
+            template_storage_adapter = S3Adapter({"bucket": f"jwnwilson-pdf-template-{ENVIRONMENT}"})
+            task_data = generate_pdf.generate_pdf(db_adapter, template_storage_adapter, pdf_storage_adapter, pdf_data)
             logger.info(f"PDF generated {pdf_data.pdf_id}")
 
             tasks_data.append(task_data)

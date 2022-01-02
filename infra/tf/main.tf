@@ -92,12 +92,12 @@ module "pdf_worker" {
 module "pdf_db" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "pdf_generation_${var.environment}"
-  hash_key = "pdf_id"
+  name     = "pdf_task_${var.environment}"
+  hash_key = "task_id"
 
   attributes = [
     {
-      name = "pdf_id"
+      name = "task_id"
       type = "S"
     }
   ]
@@ -127,13 +127,19 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
         "Sid": "ListObjectsInBucket",
         "Effect": "Allow",
         "Action": ["s3:ListBucket"],
-        "Resource": ["arn:aws:s3:::pdf_generation_${var.environment}"]
+        "Resource": [
+          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}",
+          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}"
+        ]
     },
     {
         "Sid": "AllObjectActions",
         "Effect": "Allow",
         "Action": "s3:*Object",
-        "Resource": ["arn:aws:s3:::pdf_generation_${var.environment}/*"]
+        "Resource": [
+          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*",
+          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*"
+        ]
     }
   ]
 }
@@ -145,12 +151,22 @@ resource "aws_iam_role_policy_attachment" "sqs-attach" {
   policy_arn = aws_iam_policy.sqs-s3-lambda-policy.arn
 }
 
-resource "aws_s3_bucket" "pdf_storage" {
-  bucket = "jwnwilson-pdf-generation-${var.environment}"
+resource "aws_s3_bucket" "pdf_task_storage" {
+  bucket = "jwnwilson-pdf-task-${var.environment}"
   acl    = "private"
 
   tags = {
-    Name        = "Pdf generation bucket${var.environment} "
+    Name        = "Pdf task bucket${var.environment} "
+    Environment = var.environment
+  }
+}
+
+resource "aws_s3_bucket" "pdf_storage" {
+  bucket = "jwnwilson-pdf-template-${var.environment}"
+  acl    = "private"
+
+  tags = {
+    Name        = "Pdf template bucket${var.environment} "
     Environment = var.environment
   }
 }
