@@ -7,6 +7,40 @@ variable "environment" {}
 resource "aws_api_gateway_rest_api" "apiLambda" {
   name        = "pdf_api_${var.environment}"
   description = "PDF creator API"
+
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Principal": "*",
+#             "Action": "execute-api:Invoke",
+#             "Resource": [
+#                 "*"
+#             ]
+#         },
+#         {
+#             "Effect": "Deny",
+#             "Principal": "*",
+#             "Action": "execute-api:Invoke",
+#             "Resource": [
+#                 "*"
+#             ],
+#             "Condition" : {
+#                 "StringNotEquals": {
+#                     "aws:SourceVpce": "${aws_vpc_endpoint.test.id}"
+#                 }
+#             }
+#         }
+#     ]
+# }
+# EOF
+
+#   endpoint_configuration {
+#     types = ["PRIVATE"]
+#     vpc_endpoint_ids = [aws_vpc_endpoint.test.id]
+#   }
 }
 
 resource "aws_api_gateway_resource" "proxy" {

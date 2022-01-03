@@ -10,8 +10,9 @@ provider "aws" {
   region  = var.aws_region
 }
 
-# Removing VPC this to remove the need to setup (and pay for) a nat gateway
-# If we attach our lambda to a VPC then we have touse a nat gateway for internet access
+# Complete using this guide:
+# https://medium.com/@ilia.lazebnik/simplifying-aws-private-api-gateway-vpc-endpoint-association-with-terraform-b379a247afbf
+
 # module "vpc" {
 #   source = "terraform-aws-modules/vpc/aws"
 
@@ -23,7 +24,24 @@ provider "aws" {
 #   # Add public_subnets and NAT Gateway to allow access to internet from Lambda
 #   public_subnets  = ["10.10.1.0/24", "10.10.2.0/24", "10.10.3.0/24"]
 #   private_subnets = ["10.10.101.0/24", "10.10.102.0/24", "10.10.103.0/24"]
-#   enable_nat_gateway = true
+#
+#   If we attach our lambda to a VPC then we have to use a nat gateway for internet access
+#   Do not do this as this is expensive.
+#   enable_nat_gateway = false
+# }
+
+# data "aws_vpc_endpoint_service" "test" {
+#   service = "execute-api"
+# }
+
+# resource "aws_vpc_endpoint" "pdf_vpc_endpoint" {
+#   vpc_id              = module.vpc.vpc_id
+#   service_name        = "pdf generation service"
+#   vpc_endpoint_type   = "Interface"
+#   private_dns_enabled = true
+
+#   subnet_ids = module.vpc.private_subnets
+#   security_group_ids = [module.vpc.default_security_group_id]
 # }
 
 module "pdf_api" {
