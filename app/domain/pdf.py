@@ -46,9 +46,7 @@ def save_url_to_storage(storage_adapter, pdf_id, url, file_name=None) -> str:
 def get_file_name(url, response) -> str:
     fname = ""
     if "Content-Disposition" in response.headers.keys():
-        fname = re.findall(
-            "filename=(.+)", response.headers["Content-Disposition"]
-        )[0]
+        fname = re.findall("filename=(.+)", response.headers["Content-Disposition"])[0]
     else:
         fname = url.split("/")[-1]
 
@@ -87,16 +85,17 @@ class PdfTemplateEntity:
         image_urls = []
         for image_url in pdf_data.images_urls:
             image_urls.append(
-                save_url_to_storage(self.template_storage_adapter, pdf_data.pdf_id, image_url)
+                save_url_to_storage(
+                    self.template_storage_adapter, pdf_data.pdf_id, image_url
+                )
             )
 
         # Return pdf data
         return PdfGenerateData(pdf_id=pdf_data.pdf_id)
-    
+
     def list_pdf_templates(self) -> List[str]:
-        """List pdf templates to choose from
-        """
-        folders = self.template_storage_adapter.list("/")
+        """List pdf templates to choose from"""
+        folders: List[str] = self.template_storage_adapter.list("/")
         return folders
 
 

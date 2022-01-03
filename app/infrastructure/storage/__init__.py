@@ -35,7 +35,8 @@ class S3Adapter(StorageAdapter):
             print("The fuck?")
             print("path", path)
             return [
-                self._get_url(obj.key) for obj in self.bucket.objects.filter(Prefix=path)
+                self._get_url(obj.key)
+                for obj in self.bucket.objects.filter(Prefix=path)
             ]
 
     def save(self, source_path: str, target_path: str) -> StorageData:
