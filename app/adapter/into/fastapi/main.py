@@ -13,7 +13,7 @@ app = FastAPI(
     title="PDF Generator Service",
     description="Generate PDFs from templates",
     version="0.0.1",
-    root_path=root_prefix
+    root_path=root_prefix,
 )
 app.include_router(pdf_template.router)
 app.include_router(pdf_generation.router)

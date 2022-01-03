@@ -21,22 +21,19 @@ class S3Adapter(StorageAdapter):
         return url + key
 
     def create_folder(self, path):
-        if not path.endswith('/'):
-            path = path + '/'
-        self.client.put_object(Bucket=self.bucket_name, Body='', Key=path)
+        if not path.endswith("/"):
+            path = path + "/"
+        self.client.put_object(Bucket=self.bucket_name, Body="", Key=path)
 
     def upload_url(self, path: str) -> UploadData:
         upload_data = self.client.generate_presigned_post(self.bucket_name, path)
-        return UploadData(
-            upload_url=upload_data["url"],
-            fields=upload_data["fields"]
-        )
+        return UploadData(upload_url=upload_data["url"], fields=upload_data["fields"])
 
     def list(self, path: str) -> List[str]:
         objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
         files = [obj["Key"] for obj in objs.get("Contents", [])]
         folders = [obj["Prefix"] for obj in objs.get("CommonPrefixes", [])]
-    
+
         return sorted(files + folders)
 
     def save(self, source_path: str, target_path: str) -> StorageData:

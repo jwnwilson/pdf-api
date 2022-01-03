@@ -1,4 +1,4 @@
-from domain.pdf import PdfTemplateEntity, PdfCreateOutData
+from domain.pdf import PdfCreateOutData, PdfTemplateEntity
 from ports.db import DbAdapter
 from ports.pdf import PdfCreateInData
 from ports.storage import StorageAdapter

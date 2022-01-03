@@ -37,9 +37,7 @@ async def create_pdf_template(
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
-    return create_pdf_uc.create_pdf(
-        db_adapter, storage_adapter, pdf_data
-    )
+    return create_pdf_uc.create_pdf(db_adapter, storage_adapter, pdf_data)
 
 
 @router.post("/upload")
@@ -49,6 +47,4 @@ async def upload_template_static(
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
-    return create_pdf_uc.create_pdf(
-        db_adapter, storage_adapter, pdf_data
-    )
+    return create_pdf_uc.create_pdf(db_adapter, storage_adapter, pdf_data)
