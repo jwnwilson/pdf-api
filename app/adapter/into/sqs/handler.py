@@ -30,8 +30,8 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
             pdf_gen_data = json.loads(record["body"])
 
             pdf_data = PdfGenerateData(
-                pdf_id=pdf_gen_data["kwargs"]["pdf_id"],
-                params=pdf_gen_data["kwargs"].get("params", {}),
+                pdf_id=pdf_gen_data["params"]["pdf_id"],
+                params=pdf_gen_data["params"],
                 task_id=pdf_gen_data["task_id"],
             )
 

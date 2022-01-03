@@ -19,7 +19,7 @@ class SqsTaskAdapter(TaskAdapter):
         task_data = TaskData(
             task_id=str(uuid.uuid4()),
             task_name=task_args.task_name,
-            kwargs=task_args.kwargs,
+            params=task_args.params,
             status="Pending",
         )
 

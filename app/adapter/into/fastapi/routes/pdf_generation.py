@@ -10,7 +10,7 @@ from use_case import generate_pdf_task, get_pdf_task
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/pdf-gen",
+    prefix="/pdf-generation",
     dependencies=[],
     responses={404: {"description": "Not found"}},
 )
@@ -23,7 +23,7 @@ async def generate_pdf(
     db_adapter=Depends(get_db_adapater),
 ) -> TaskData:
     pdf_id = pdf_params.pdf_id
-    pdf_data = TaskArgs(task_name="generate_pdf", kwargs=pdf_params.dict())
+    pdf_data = TaskArgs(task_name="generate_pdf", params=pdf_params.params)
 
     logger.info(f"Generating PDF: {pdf_id}")
     # call create use case

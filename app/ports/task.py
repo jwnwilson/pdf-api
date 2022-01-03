@@ -6,15 +6,14 @@ from pydantic import BaseModel
 
 class TaskArgs(BaseModel):
     task_name: str
-    kwargs: dict
+    params: dict
 
 
 class TaskData(BaseModel):
     task_id: str
     task_name: str
-    kwargs: dict
+    params: dict
     status: str
-    result: Optional[dict]
 
 
 class TaskAdapter(ABC):

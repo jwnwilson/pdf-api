@@ -7,7 +7,7 @@ import pdfkit
 import requests
 from jinja2 import Environment, FileSystemLoader
 from ports.db import DbAdapter
-from ports.pdf import PdfData, PdfGenerateData
+from ports.pdf import PdfData, PdfGenerateData, PdfCreateInData, PdfCreateOutData
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskData
 
@@ -62,7 +62,7 @@ class PdfTemplateEntity:
         self.db_adapter = db_adapter
         self.template_storage_adapter = template_storage_adapter
 
-    def create_pdf_template(self, pdf_data: PdfData) -> PdfGenerateData:
+    def create_pdf_template(self, pdf_data: PdfCreateInData) -> PdfCreateOutData:
         """[summary]
 
         Args:
@@ -72,26 +72,14 @@ class PdfTemplateEntity:
             PdfGenerateData: [description]
         """
         self.template_storage_adapter.create_folder(pdf_data.pdf_id)
+        upload_template_path = f"{pdf_data.pdf_id}/template.html"
+        upload_url = self.template_storage_adapter.upload_url(upload_template_path)
 
-        # Download html and save in storage
-        html_path = save_url_to_storage(
-            self.template_storage_adapter,
-            pdf_data.pdf_id,
-            pdf_data.html_url,
-            file_name="template.html",
+        return PdfCreateOutData(
+            pdf_id=pdf_data.pdf_id,
+            template_upload_url=upload_url.upload_url,
+            template_upload_fields=upload_url.fields
         )
-
-        # Download images and save in storage
-        image_urls = []
-        for image_url in pdf_data.images_urls:
-            image_urls.append(
-                save_url_to_storage(
-                    self.template_storage_adapter, pdf_data.pdf_id, image_url
-                )
-            )
-
-        # Return pdf data
-        return PdfGenerateData(pdf_id=pdf_data.pdf_id)
 
     def list_pdf_templates(self) -> List[str]:
         """List pdf templates to choose from"""

@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 import boto3
-from ports.storage import StorageAdapter
+from ports.storage import StorageAdapter, UploadData
 
 from app.ports.storage import StorageData
 
@@ -21,23 +21,23 @@ class S3Adapter(StorageAdapter):
         return url + key
 
     def create_folder(self, path):
-        key = self.bucket.new_key(path)
-        key.set_contents_from_string("")
+        if not path.endswith('/'):
+            path = path + '/'
+        self.client.put_object(Bucket=self.bucket_name, Body='', Key=path)
 
-    def upload_url(self):
-        pass
+    def upload_url(self, path: str) -> UploadData:
+        upload_data = self.client.generate_presigned_post(self.bucket_name, path)
+        return UploadData(
+            upload_url=upload_data["url"],
+            fields=upload_data["fields"]
+        )
 
-    def list(self, path: str, folders=False) -> List[str]:
-        if folders:
-            objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
-            return [obj["Prefix"] for obj in objs["CommonPrefixes"]]
-        else:
-            print("The fuck?")
-            print("path", path)
-            return [
-                self._get_url(obj.key)
-                for obj in self.bucket.objects.filter(Prefix=path)
-            ]
+    def list(self, path: str) -> List[str]:
+        objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
+        files = [obj["Key"] for obj in objs.get("Contents", [])]
+        folders = [obj["Prefix"] for obj in objs.get("CommonPrefixes", [])]
+    
+        return sorted(files + folders)
 
     def save(self, source_path: str, target_path: str) -> StorageData:
         logger.info(

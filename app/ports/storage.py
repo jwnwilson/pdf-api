@@ -6,7 +6,11 @@ from pydantic import BaseModel
 
 class StorageData(BaseModel):
     path: str
-    upload_url: Optional[str]
+
+
+class UploadData(BaseModel):
+    upload_url: str
+    fields: dict
 
 
 class StorageAdapter(ABC):
@@ -19,7 +23,7 @@ class StorageAdapter(ABC):
     def list(self, path: str) -> List[str]:
         raise NotImplementedError
 
-    def upload_url(self) -> StorageData:
+    def upload_url(self):
         raise NotImplementedError
 
     def save(self, source_file_path, target_file_path) -> StorageData:

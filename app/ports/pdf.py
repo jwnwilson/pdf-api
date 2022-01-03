@@ -3,10 +3,14 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class PdfCreateData(BaseModel):
+class PdfCreateInData(BaseModel):
     pdf_id: str
-    html_url: str
-    images_urls: List[str]
+
+
+class PdfCreateOutData(BaseModel):
+    pdf_id: str
+    template_upload_url: str
+    template_upload_fields: dict
 
 
 class PdfData(BaseModel):
