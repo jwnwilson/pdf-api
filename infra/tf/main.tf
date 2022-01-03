@@ -173,7 +173,7 @@ resource "aws_iam_role_policy_attachment" "sqs-attach-api" {
 
 resource "aws_s3_bucket" "pdf_task_storage" {
   bucket = "jwnwilson-pdf-task-${var.environment}"
-  acl    = "private"
+  acl    = "public-read"
 
   tags = {
     Name        = "Pdf task bucket${var.environment} "

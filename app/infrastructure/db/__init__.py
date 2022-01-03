@@ -11,7 +11,7 @@ class DynamodbAdapter(DbAdapter):
         self.table = self.client.Table(config["table"])
 
     def read(self, record_id: str):
-        return self.table.get_item(Key={"task_id": record_id})
+        return self.table.get_item(Key={"task_id": record_id})["Item"]
 
     def create(self, record_data: dict):
         return self.table.put_item(Item=record_data)
