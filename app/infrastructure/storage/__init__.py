@@ -27,9 +27,16 @@ class S3Adapter(StorageAdapter):
     def upload_url(self):
         pass
 
-    def list(self, path: str) -> List[str]:
-        objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
-        return [obj["Prefix"] for obj in objs["CommonPrefixes"]]
+    def list(self, path: str, folders=False) -> List[str]:
+        if folders:
+            objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
+            return [obj["Prefix"] for obj in objs["CommonPrefixes"]]
+        else:
+            print("The fuck?")
+            print("path", path)
+            return [
+                self._get_url(obj.key) for obj in self.bucket.objects.filter(Prefix=path)
+            ]
 
     def save(self, source_path: str, target_path: str) -> StorageData:
         logger.info(

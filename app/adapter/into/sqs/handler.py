@@ -29,8 +29,6 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
             # Get pdf uuid to fetch files
             pdf_gen_data = json.loads(record["body"])
 
-            print("body", pdf_gen_data)
-
             pdf_data = PdfGenerateData(
                 pdf_id=pdf_gen_data["kwargs"]["pdf_id"],
                 params=pdf_gen_data["kwargs"].get("params", {}),
