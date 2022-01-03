@@ -53,11 +53,11 @@ async def generate_pdf(
     return pdf_task_data
 
 
-@router.get("/{pdf_id}")
+@router.get("/{task_id}")
 async def get_pdf(
-    pdf_id: str,
+    task_id: str,
     task_adapter=Depends(get_task_adapater),
     db_adapter=Depends(get_db_adapater),
 ) -> PdfData:
     # Attempt to get pdf data by id
-    return get_pdf_task.get_pdf(task_adapter, db_adapter, pdf_id)
+    return get_pdf_task.get_pdf(task_adapter, db_adapter, task_id)

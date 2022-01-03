@@ -11,7 +11,7 @@ class DynamodbAdapter(DbAdapter):
         self.table = self.client.Table(config["table"])
 
     def read(self, record_id: str):
-        return self.table.get_item(Key={"id": record_id})
+        return self.table.get_item(Key={"task_id": record_id})
 
     def create(self, record_data: dict):
         return self.table.put_item(Item=record_data)
@@ -30,7 +30,7 @@ class DynamodbAdapter(DbAdapter):
         update_expression += ", ".join(update_expressions)
 
         return self.table.update_item(
-            Key={"id": record_id},
+            Key={"task_id": record_id},
             UpdateExpression=update_expression,
             ExpressionAttributeValues=expression_attr_values,
             ExpressionAttributeNames=expression_attr_names,
