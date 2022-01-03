@@ -7,10 +7,15 @@ class PdfCreateInData(BaseModel):
     pdf_id: str
 
 
+class PdfUploadInData(BaseModel):
+    pdf_id: str
+    file_name: str
+
+
 class PdfCreateOutData(BaseModel):
     pdf_id: str
-    template_upload_url: str
-    template_upload_fields: dict
+    upload_url: str
+    upload_fields: dict
 
 
 class PdfData(BaseModel):

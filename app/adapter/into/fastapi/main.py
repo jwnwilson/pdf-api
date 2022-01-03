@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI
 
-from .routes import pdf, pdf_generation
+from .routes import pdf_generation, pdf_template
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 IS_LAMBDA = os.environ.get("AWS_EXECUTION_ENV") is not None
@@ -15,7 +15,7 @@ app = FastAPI(
     version="0.0.1",
     root_path=root_prefix
 )
-app.include_router(pdf.router)
+app.include_router(pdf_template.router)
 app.include_router(pdf_generation.router)
 
 

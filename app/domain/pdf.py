@@ -7,7 +7,7 @@ import pdfkit
 import requests
 from jinja2 import Environment, FileSystemLoader
 from ports.db import DbAdapter
-from ports.pdf import PdfData, PdfGenerateData, PdfCreateInData, PdfCreateOutData
+from ports.pdf import PdfData, PdfGenerateData, PdfCreateInData, PdfCreateOutData, PdfUploadInData
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskData
 
@@ -71,14 +71,21 @@ class PdfTemplateEntity:
         Returns:
             PdfGenerateData: [description]
         """
-        self.template_storage_adapter.create_folder(pdf_data.pdf_id)
-        upload_template_path = f"{pdf_data.pdf_id}/template.html"
+        return self.upload_static(
+            PdfUploadInData(
+                pdf_id=pdf_data.pdf_id,
+                file_name="template.html"
+            )
+        )
+    
+    def upload_static(self, pdf_data: PdfUploadInData) -> PdfCreateOutData:
+        upload_template_path = f"{pdf_data.pdf_id}/{pdf_data.file_name}"
         upload_url = self.template_storage_adapter.upload_url(upload_template_path)
 
         return PdfCreateOutData(
             pdf_id=pdf_data.pdf_id,
-            template_upload_url=upload_url.upload_url,
-            template_upload_fields=upload_url.fields
+            upload_url=upload_url.upload_url,
+            upload_fields=upload_url.fields
         )
 
     def list_pdf_templates(self) -> List[str]:

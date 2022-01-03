@@ -23,7 +23,7 @@ class StorageAdapter(ABC):
     def list(self, path: str) -> List[str]:
         raise NotImplementedError
 
-    def upload_url(self):
+    def upload_url(self, path: str):
         raise NotImplementedError
 
     def save(self, source_file_path, target_file_path) -> StorageData:
