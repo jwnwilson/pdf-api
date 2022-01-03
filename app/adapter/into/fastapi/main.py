@@ -5,9 +5,8 @@ from fastapi import FastAPI
 from .routes import pdf_generation, pdf_template
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
-IS_LAMBDA = os.environ.get("AWS_EXECUTION_ENV") is not None
 
-root_prefix = f"/{ENVIRONMENT}" if IS_LAMBDA else "/"
+root_prefix = f"/"
 
 app = FastAPI(
     title="PDF Generator Service",
