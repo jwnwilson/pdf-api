@@ -2,6 +2,14 @@
 
 A serverless (AWS lambda) FastAPI template intended to be extended with other microservices using SQS to communicate between services.
 
+# TODO
+
+Remaining tasks:
+- Multiple pdf generation
+  - Aggregation into one pdf
+- user / customer sortkey / s3 prefix
+- test suite
+
 # Requirements
 
 This project requires installed on your OS.
@@ -22,7 +30,7 @@ This will build a lambda compatible docker container running fast api that can b
 
 It is possible to send events to the lambda worker running the RIE lambda emulator API by running the following command:
 
-`curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"Records": [{"body": {"html_url": "https://example.html", "image_urls": []}}]}'`
+`curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"Records": [{"body": \"{\"pdf_id\": \"test\", \"params\": {}}"}]}'`
 
 Sample json payload:
 
@@ -33,8 +41,8 @@ Sample json payload:
       "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
       "receiptHandle": "MessageReceiptHandle",
       "body": {
-          "html_url": "https://example.html",
-          "image_urls": []
+          "pdf_id": "test",
+          "params": {}
       },
       "attributes": {
         "ApproximateReceiveCount": "1",
