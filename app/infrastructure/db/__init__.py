@@ -14,8 +14,6 @@ class DynamodbAdapter(DbAdapter):
         return self.table.get_item(Key={"id": record_id})
 
     def create(self, record_data: dict):
-        print(self.table)
-        print(record_data)
         return self.table.put_item(Item=record_data)
 
     def update(self, record_id: str, record_data: dict):
