@@ -1,7 +1,7 @@
 import logging
-import os
 import re
 import uuid
+from typing import List
 
 import pdfkit
 import requests
@@ -14,6 +14,93 @@ from ports.task import TaskAdapter, TaskData
 logger = logging.getLogger(__name__)
 
 
+def save_url_to_file(storage_adapter, pdf_id, url, file_name=None) -> str:
+    """Download file from url and save it locally
+
+    Args:
+        storage_adapter ([type]): [description]
+        pdf_id ([type]): [description]
+        url ([type]): [description]
+        file_name ([type], optional): [description]. Defaults to None.
+
+    Returns:
+        str: [description]
+    """
+    # Download file
+    file_response = requests.get(url)
+    # Get file name from url file name or use url path
+    if not file_name:
+        file_name = get_file_name(url, file_response)
+    file_path = f"{pdf_id}/{file_name}.html"
+    local_html_path = "/tmp/" + file_path
+
+    with open(local_html_path, "w") as file:
+        file.write(file_response.text)
+
+    # Save in our storage adapter
+    storage_adapter.save(local_html_path, file_path)
+
+    return file_path
+
+
+def get_file_name(url, response) -> str:
+    fname = ""
+    if "Content-Disposition" in response.headers.keys():
+        fname = re.findall("filename=(.+)", response.headers["Content-Disposition"])[0]
+    else:
+        fname = url.split("/")[-1]
+
+    return fname
+
+
+class PdfTemplateEntity:
+    def __init__(
+        self,
+        db_adapter: DbAdapter,
+        template_storage_adapter: StorageAdapter,
+    ):
+        self.db_adapter = db_adapter
+        self.template_storage_adapter = template_storage_adapter
+
+    def create_pdf_template(self, pdf_data: PdfData) -> PdfData:
+        """[summary]
+
+        Args:
+            pdf_data (PdfData): [description]
+
+        Returns:
+            PdfGenerateData: [description]
+        """
+        self.template_storage_adapter.create_folder(pdf_data.pdf_id)
+
+        # Download html and save in storage
+        html_urls = []
+        for html_url in pdf_data.html_urls:
+            html_urls.append(
+                save_url_to_file(
+                    self.template_storage_adapter, pdf_data.pdf_id, html_url
+                )
+            )
+
+        # Download images and save in storage
+        image_urls = []
+        for image_url in pdf_data.images_urls:
+            image_urls.append(
+                save_url_to_file(
+                    self.template_storage_adapter, pdf_data.pdf_id, image_url
+                )
+            )
+
+        # Return pdf data
+        return pdf_data
+
+    def list_pdf_templates(self) -> List[str]:
+        """List pdf templates to choose from"""
+        folders: List[str] = self.template_storage_adapter.list("/")
+        return folders
+
+
+# TODO: Break into pdf template and pdf entities
 class PdfEntity:
     def __init__(
         self,
@@ -24,63 +111,6 @@ class PdfEntity:
         self.db_adapter = db_adapter
         self.template_storage_adapter = template_storage_adapter
         self.task_storage_adapter = task_storage_adapter
-
-    def _get_file_name(self, url, response) -> str:
-        fname = ""
-        if "Content-Disposition" in response.headers.keys():
-            fname = re.findall(
-                "filename=(.+)", response.headers["Content-Disposition"]
-            )[0]
-        else:
-            fname = url.split("/")[-1]
-
-        return fname
-
-    def _save_url_to_file(self, storage_adapter, pdf_id, url, file_name=None) -> str:
-        # Download file
-        file_response = requests.get(url)
-        # Get file name from url file name or use url path
-        if not file_name:
-            file_name = self._get_file_name(url, file_response)
-        file_path = f"{pdf_id}/{file_name}.html"
-        local_html_path = "/tmp/" + file_path
-
-        with open(local_html_path, "w") as file:
-            file.write(file_response.text)
-
-        # Save in our storage adapter
-        storage_adapter.save(local_html_path, file_path)
-
-        return file_path
-
-    def create_pdf(self, pdf_data: PdfData) -> PdfGenerateData:
-        """[summary]
-
-        Args:
-            pdf_data (PdfData): [description]
-
-        Returns:
-            PdfGenerateData: [description]
-        """
-        pdf_id = uuid.uuid4()
-
-        # Download html and save in storage
-        html_path = self._save_url_to_file(
-            self.template_storage_adapter,
-            pdf_id,
-            pdf_data.html_url,
-            file_name="template.html",
-        )
-
-        # Download images and save in storage
-        image_urls = []
-        for image_url in pdf_data.images_urls:
-            image_urls.append(
-                self._save_url_to_file(self.template_storage_adapter, pdf_id, image_url)
-            )
-
-        # Return pdf data
-        return PdfGenerateData(pdf_id=pdf_id)
 
     def get_pdf(self, uuid: str) -> PdfData:
         logger.info(f"Getting pdf data: {uuid}")

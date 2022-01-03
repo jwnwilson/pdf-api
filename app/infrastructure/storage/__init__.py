@@ -13,19 +13,23 @@ class S3Adapter(StorageAdapter):
     def __init__(self, config: dict) -> None:
         self.bucket_name = config["bucket"]
         self.s3 = boto3.resource("s3")
+        self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
 
     def _get_url(self, key: str) -> str:
         url = f"https://{self.bucket_name}.s3.amazonaws.com/"
         return url + key
 
+    def create_folder(self, path):
+        key = self.bucket.new_key(path)
+        key.set_contents_from_string("")
+
     def upload_url(self):
         pass
 
     def list(self, path: str) -> List[str]:
-        return [
-            self._get_url(obj.key) for obj in self.bucket.objects.filter(Prefix=path)
-        ]
+        objs = self.client.list_objects_v2(Bucket=self.bucket_name, Delimiter=path)
+        return [obj["Prefix"] for obj in objs["CommonPrefixes"]]
 
     def save(self, source_path: str, target_path: str) -> StorageData:
         logger.info(

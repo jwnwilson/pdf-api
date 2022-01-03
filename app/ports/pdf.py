@@ -4,14 +4,20 @@ from pydantic import BaseModel
 
 
 class PdfCreateData(BaseModel):
-    html_url: str
+    pdf_id: str
+    html_urls: List[str]
     images_urls: List[str]
 
 
 class PdfData(BaseModel):
     pdf_id: str
-    html_url: str
+    html_urls: Optional[List[str]]
     images_urls: Optional[List[str]]
+
+
+class PdfGenerateDataIn(BaseModel):
+    pdf_id: str
+    params: dict
 
 
 class PdfGenerateData(BaseModel):

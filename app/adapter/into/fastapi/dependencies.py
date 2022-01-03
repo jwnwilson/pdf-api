@@ -23,3 +23,8 @@ def get_db_adapater() -> DbAdapter:
 def get_storage_adapater() -> StorageAdapter:
     bucket_name = f"jwnwilson-pdf-task-{ENVIRONMENT}"
     return S3Adapter({"bucket": bucket_name})
+
+
+def get_template_storage_adapater() -> StorageAdapter:
+    bucket_name = f"jwnwilson-pdf-template-{ENVIRONMENT}"
+    return S3Adapter({"bucket": bucket_name})

@@ -1,12 +1,14 @@
+from typing import List
+
 from domain.pdf import PdfTemplateEntity
 from ports.db import DbAdapter
 from ports.pdf import PdfData
 from ports.storage import StorageAdapter
 
 
-def create_pdf(
-    db_adapter: DbAdapter, storage_adapter: StorageAdapter, pdf_data: PdfData
-):
+def list_pdf(
+    db_adapter: DbAdapter, template_storage_adapter: StorageAdapter
+) -> List[str]:
     """[summary]
 
     Args:
@@ -18,7 +20,7 @@ def create_pdf(
     """
     # create pdf
     pdf_entity = PdfTemplateEntity(
-        db_adapter=db_adapter, storage_adapter=storage_adapter
+        db_adapter=db_adapter, template_storage_adapter=template_storage_adapter
     )
-    task_data = pdf_entity.create_pdf_template(PdfData)
+    task_data: List[str] = pdf_entity.list_pdf_templates()
     return task_data

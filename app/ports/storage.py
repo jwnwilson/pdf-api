@@ -13,7 +13,10 @@ class StorageAdapter(ABC):
     def __init__(self) -> None:
         pass
 
-    def list(self) -> List[str]:
+    def create_folder(self, path: str):
+        raise NotImplementedError
+
+    def list(self, path: str) -> List[str]:
         raise NotImplementedError
 
     def upload_url(self) -> StorageData:
