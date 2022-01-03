@@ -175,6 +175,19 @@ resource "aws_s3_bucket" "pdf_task_storage" {
   bucket = "jwnwilson-pdf-task-${var.environment}"
   acl    = "public-read"
 
+  policy = <<EOF
+  {
+    "Version": "2008-10-17",
+    "Statement": [{
+      "Sid": "AllowPublicRead",
+      "Effect": "Allow",
+      "Principal": { "AWS": "*" },
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*" ]
+    }]
+  }
+  EOF
+
   tags = {
     Name        = "Pdf task bucket${var.environment} "
     Environment = var.environment
