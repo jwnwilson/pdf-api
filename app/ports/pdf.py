@@ -21,7 +21,7 @@ class PdfCreateOutData(BaseModel):
 class PdfData(BaseModel):
     pdf_id: str
     html_url: str
-    images_urls: Optional[List[str]]
+    static_urls: Optional[List[str]]
 
 
 class PdfGenerateDataIn(BaseModel):

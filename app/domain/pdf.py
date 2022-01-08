@@ -2,6 +2,7 @@ import logging
 import re
 import uuid
 from typing import List
+from app.ports.user import UserData
 
 import pdfkit
 import requests
@@ -12,41 +13,12 @@ from ports.pdf import (
     PdfCreateOutData,
     PdfData,
     PdfGenerateData,
-    PdfUploadInData,
+    PdfUploadInData
 )
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskData
 
 logger = logging.getLogger(__name__)
-
-
-def save_url_to_storage(storage_adapter, pdf_id, url, file_name=None) -> str:
-    """Download file from url and save it locally
-
-    Args:
-        storage_adapter ([type]): [description]
-        pdf_id ([type]): [description]
-        url ([type]): [description]
-        file_name ([type], optional): [description]. Defaults to None.
-
-    Returns:
-        str: [description]
-    """
-    # Download file
-    file_response = requests.get(url)
-    # Get file name from url file name or use url path
-    if not file_name:
-        file_name = get_file_name(url, file_response)
-    file_path = f"{pdf_id}/{file_name}.html"
-    local_html_path = "/tmp/" + file_path
-
-    with open(local_html_path, "w") as file:
-        file.write(file_response.text)
-
-    # Save in our storage adapter
-    storage_adapter.save(local_html_path, file_path)
-
-    return file_path
 
 
 def get_file_name(url, response) -> str:
@@ -59,15 +31,30 @@ def get_file_name(url, response) -> str:
     return fname
 
 
-class PdfTemplateEntity:
+def download_file(url, file_name=None) -> str:
+        file_data = requests.get(url)
+        file_name = file_name or get_file_name(url, file_data)
+        file_path = f"/tmp/{file_name}"
+        # save html template
+        with open(file_path, "w") as fh:
+            fh.write(file_data.text)
+
+        return file_path
+
+
+class PdfBaseEntity:
     def __init__(
         self,
         db_adapter: DbAdapter,
         template_storage_adapter: StorageAdapter,
+        task_storage_adapter: StorageAdapter,
     ):
         self.db_adapter = db_adapter
         self.template_storage_adapter = template_storage_adapter
+        self.task_storage_adapter = task_storage_adapter
 
+
+class PdfTemplateEntity(PdfBaseEntity):
     def create_pdf_template(self, pdf_data: PdfCreateInData) -> PdfCreateOutData:
         """[summary]
 
@@ -82,8 +69,7 @@ class PdfTemplateEntity:
         )
 
     def upload_static(self, pdf_data: PdfUploadInData) -> PdfCreateOutData:
-        upload_template_path = f"{pdf_data.pdf_id}/{pdf_data.file_name}"
-        upload_url = self.template_storage_adapter.upload_url(upload_template_path)
+        upload_url = self.template_storage_adapter.upload_url(f"{pdf_data.pdf_id}/{pdf_data.file_name}")
 
         return PdfCreateOutData(
             pdf_id=pdf_data.pdf_id,
@@ -93,21 +79,12 @@ class PdfTemplateEntity:
 
     def list_pdf_templates(self) -> List[str]:
         """List pdf templates to choose from"""
-        folders: List[str] = self.template_storage_adapter.list("/")
-        return folders
+        folders: List[str] = self.template_storage_adapter.list("/", include_files=False)        
+        return [
+            f.split("/")[1] for f in folders
+        ]
 
-
-# TODO: Break into pdf template and pdf entities
-class PdfEntity:
-    def __init__(
-        self,
-        db_adapter: DbAdapter,
-        template_storage_adapter: StorageAdapter,
-        task_storage_adapter: StorageAdapter,
-    ):
-        self.db_adapter = db_adapter
-        self.template_storage_adapter = template_storage_adapter
-        self.task_storage_adapter = task_storage_adapter
+class PdfEntity(PdfBaseEntity):
 
     def get_pdf(self, uuid: str) -> PdfData:
         logger.info(f"Getting pdf data: {uuid}")
@@ -116,17 +93,17 @@ class PdfEntity:
         files = self.template_storage_adapter.list(path)
         try:
             html_path = [x for x in files if x.endswith("template.html")][0]
-            image_urls = [x for x in files if not x.endswith("html")]
+            static_urls = [x for x in files if not x.endswith("html")]
         except IndexError:
             logger.error(f"Unable to find template html file for pdf: {uuid}")
             raise
 
         logger.info(f"Got pdf data: {uuid}")
         logger.info(f"Html pdf data: {html_path}")
-        logger.info(f"Image pdf data: {image_urls}")
-        return PdfData(pdf_id=uuid, html_url=html_path, image_urls=image_urls)
+        logger.info(f"Additional pdf data: {static_urls}")
+        return PdfData(pdf_id=uuid, html_url=html_path, static_urls=static_urls)
 
-    def generate_html(self, template_url: str, params: dict) -> str:
+    def generate_html(self, pdf_data: PdfData, params: dict) -> str:
         """[summary]
 
         Args:
@@ -136,12 +113,12 @@ class PdfEntity:
             str: [description]
         """
         # Save html template data to file
-        html_template_path = "/tmp/template.html"
         html_generated_path = "/tmp/generated.html"
-        html_template_data = requests.get(template_url)
-        # save html template
-        with open(html_template_path, "w") as fh:
-            fh.write(html_template_data.text)
+
+        download_file(pdf_data.html_url, file_name="template.html")
+
+        for static_url in pdf_data.static_urls:
+            download_file(static_url)
 
         jinja_env = Environment(loader=FileSystemLoader("/tmp"))
         template = jinja_env.get_template("template.html")
@@ -168,7 +145,7 @@ class PdfEntity:
         pdf_data = self.get_pdf(pdf_gen_data.pdf_id)
 
         # generate html from template + parameters
-        html_path = self.generate_html(pdf_data.html_url, pdf_gen_data.params)
+        html_path = self.generate_html(pdf_data, pdf_gen_data.params)
 
         # Create local folders if needed
         local_file_folder = f"/tmp/"
@@ -181,8 +158,8 @@ class PdfEntity:
 
         # save pdf file
         logger.info(f"Saving PDF task: {task_id} to storage")
-        pdf_file_path = f"{task_id}/render.pdf"
-        storage_data = self.task_storage_adapter.save(local_file_path, pdf_file_path)
+        pdf_storage_path = f"{task_id}/render.pdf"
+        storage_data = self.task_storage_adapter.save(local_file_path, pdf_storage_path)
         logger.info(f"Saved PDF task: {task_id} to storage")
 
         # update task db record

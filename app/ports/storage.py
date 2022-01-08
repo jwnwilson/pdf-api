@@ -8,7 +8,7 @@ class StorageData(BaseModel):
     path: str
 
 
-class UploadData(BaseModel):
+class UploadUrlData(BaseModel):
     upload_url: str
     fields: dict
 
@@ -23,7 +23,7 @@ class StorageAdapter(ABC):
     def list(self, path: str) -> List[str]:
         raise NotImplementedError
 
-    def upload_url(self, path: str):
+    def upload_url(self, path: str) -> UploadUrlData:
         raise NotImplementedError
 
     def save(self, source_file_path, target_file_path) -> StorageData:

@@ -11,6 +11,7 @@ class TaskArgs(BaseModel):
 
 class TaskData(BaseModel):
     task_id: str
+    user_id: str
     task_name: str
     params: dict
     status: str
