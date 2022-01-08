@@ -27,6 +27,7 @@ class SqsTaskAdapter(TaskAdapter):
         )
 
         logger.info(f"Creating task: {task_data.task_id}")
+        print("task_data", task_data.dict())
         sqs_resp = self.sqs.send_message(
             QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data.dict()))
         )

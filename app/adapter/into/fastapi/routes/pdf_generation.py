@@ -23,7 +23,11 @@ async def generate_pdf(
     db_adapter=Depends(get_db_adapater),
 ) -> TaskData:
     pdf_id = pdf_params.pdf_id
-    pdf_data = TaskArgs(task_name="generate_pdf", params=pdf_params.params)
+    pdf_params.params["pdf_id"] = pdf_id
+    pdf_data = TaskArgs(
+        task_name="generate_pdf", 
+        params=pdf_params.params
+    )
 
     logger.info(f"Generating PDF: {pdf_id}")
     # call create use case
