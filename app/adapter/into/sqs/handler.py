@@ -29,10 +29,11 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
             logger.info(f"Processing record {i} from SQS")
             # Get pdf uuid to fetch files
             pdf_gen_data = json.loads(record["body"])
+            print("pdf_gen_data", pdf_gen_data)
             user = UserData(user_id=pdf_gen_data["user_id"])
 
             pdf_data = PdfGenerateData(
-                pdf_id=pdf_gen_data["params"],
+                pdf_id=pdf_gen_data["params"]["pdf_id"],
                 params=pdf_gen_data["params"],
                 task_id=pdf_gen_data["task_id"],
             )

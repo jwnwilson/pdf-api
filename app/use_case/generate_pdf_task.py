@@ -21,7 +21,6 @@ def generate_pdf_task(
     """
     # create pdf task
     task_service = TaskEntity(event_adapter=event_adapter, db_adapter=db_adapter)
-    pdf_task_data.params["user_id"] = 1
     pdf_task_data = task_service.create_task(pdf_task_data)
 
     # return pdf task data
