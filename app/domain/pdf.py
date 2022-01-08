@@ -2,7 +2,6 @@ import logging
 import re
 import uuid
 from typing import List
-from app.ports.user import UserData
 
 import pdfkit
 import requests
@@ -13,10 +12,12 @@ from ports.pdf import (
     PdfCreateOutData,
     PdfData,
     PdfGenerateData,
-    PdfUploadInData
+    PdfUploadInData,
 )
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter, TaskData
+
+from app.ports.user import UserData
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +33,14 @@ def get_file_name(url, response) -> str:
 
 
 def download_file(url, file_name=None) -> str:
-        file_data = requests.get(url)
-        file_name = file_name or get_file_name(url, file_data)
-        file_path = f"/tmp/{file_name}"
-        # save html template
-        with open(file_path, "w") as fh:
-            fh.write(file_data.text)
+    file_data = requests.get(url)
+    file_name = file_name or get_file_name(url, file_data)
+    file_path = f"/tmp/{file_name}"
+    # save html template
+    with open(file_path, "w") as fh:
+        fh.write(file_data.text)
 
-        return file_path
+    return file_path
 
 
 class PdfBaseEntity:
@@ -69,7 +70,9 @@ class PdfTemplateEntity(PdfBaseEntity):
         )
 
     def upload_static(self, pdf_data: PdfUploadInData) -> PdfCreateOutData:
-        upload_url = self.template_storage_adapter.upload_url(f"{pdf_data.pdf_id}/{pdf_data.file_name}")
+        upload_url = self.template_storage_adapter.upload_url(
+            f"{pdf_data.pdf_id}/{pdf_data.file_name}"
+        )
 
         return PdfCreateOutData(
             pdf_id=pdf_data.pdf_id,
@@ -79,13 +82,13 @@ class PdfTemplateEntity(PdfBaseEntity):
 
     def list_pdf_templates(self) -> List[str]:
         """List pdf templates to choose from"""
-        folders: List[str] = self.template_storage_adapter.list("/", include_files=False)        
-        return [
-            f.split("/")[1] for f in folders
-        ]
+        folders: List[str] = self.template_storage_adapter.list(
+            "/", include_files=False
+        )
+        return [f.split("/")[1] for f in folders]
+
 
 class PdfEntity(PdfBaseEntity):
-
     def get_pdf(self, uuid: str) -> PdfData:
         logger.info(f"Getting pdf data: {uuid}")
         # Get image files from storage

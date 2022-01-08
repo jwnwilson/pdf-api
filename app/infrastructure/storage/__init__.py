@@ -2,9 +2,7 @@ import logging
 from typing import List
 
 import boto3
-from ports.storage import StorageAdapter, UploadUrlData
-
-from ports.storage import StorageData
+from ports.storage import StorageAdapter, StorageData, UploadUrlData
 from ports.user import UserData
 
 logger = logging.getLogger(__name__)
@@ -32,16 +30,22 @@ class S3Adapter(StorageAdapter):
     def upload_url(self, path: str) -> UploadUrlData:
         path = self.generate_path(path)
         upload_data = self.client.generate_presigned_post(self.bucket_name, path)
-        return UploadUrlData(upload_url=upload_data["url"], fields=upload_data["fields"])
+        return UploadUrlData(
+            upload_url=upload_data["url"], fields=upload_data["fields"]
+        )
 
     def list(self, path: str, include_files=True, include_folders=True) -> List[str]:
         prefix = self.generate_path(path)
-        objs = self.client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix, Delimiter="/")
-        results = []
+        objs = self.client.list_objects_v2(
+            Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"
+        )
+        results: List[str] = []
         if include_files:
             results = results + [obj["Key"] for obj in objs.get("Contents", [])]
         if include_folders:
-            results = results + [obj["Prefix"] for obj in objs.get("CommonPrefixes", [])]
+            results = results + [
+                obj["Prefix"] for obj in objs.get("CommonPrefixes", [])
+            ]
 
         return sorted(results)
 

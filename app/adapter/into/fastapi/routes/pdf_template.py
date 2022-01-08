@@ -3,8 +3,8 @@ from typing import List
 
 from adapter.into.fastapi.dependencies import (
     get_db_adapater,
+    get_task_storage_adapater,
     get_template_storage_adapater,
-    get_task_storage_adapater
 )
 from fastapi import APIRouter, Depends, HTTPException
 from ports.pdf import PdfCreateInData, PdfCreateOutData, PdfUploadInData
@@ -27,7 +27,11 @@ async def list_pdf_templates(
     db_adapter=Depends(get_db_adapater),
 ) -> List[str]:
     # call create use case
-    pdfs: List[str] = list_pdf_uc.list_pdf(db_adapter, task_storage_adapter=task_storage_adapter, template_storage_adapter=template_storage_adapter)
+    pdfs: List[str] = list_pdf_uc.list_pdf(
+        db_adapter,
+        task_storage_adapter=task_storage_adapter,
+        template_storage_adapter=template_storage_adapter,
+    )
     # return pdf id with pdf job data
     return pdfs
 
@@ -40,7 +44,9 @@ async def create_pdf_template(
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
-    return create_pdf_uc.create_pdf(db_adapter, task_storage_adapter, template_storage_adapter, pdf_data)
+    return create_pdf_uc.create_pdf(
+        db_adapter, task_storage_adapter, template_storage_adapter, pdf_data
+    )
 
 
 @router.post("/upload")
@@ -51,4 +57,6 @@ async def upload_template_static(
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
-    return create_pdf_uc.upload_static(db_adapter, task_storage_adapter, template_storage_adapter, pdf_data)
+    return create_pdf_uc.upload_static(
+        db_adapter, task_storage_adapter, template_storage_adapter, pdf_data
+    )

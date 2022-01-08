@@ -24,7 +24,7 @@ def generate_pdf(
         db_adapter=db_adapter,
         template_storage_adapter=template_storage_adapter,
         task_storage_adapter=task_storage_adapter,
-        user_id="1"
+        user_id="1",
     )
     task_data = pdf_entity.generate_pdf(pdf_data)
     return task_data
