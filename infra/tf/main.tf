@@ -177,7 +177,8 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
         "Effect": "Allow",
         "Action": [
             "ssm:DescribeParameters",
-            "ssm:GetParameters"
+            "ssm:GetParameters",
+            "ssm:GetParameter"
         ],
         "Resource": [
           "arn:aws:ssm:eu-west-1:675468650888:parameter/pdf-api/upload_access_id_${var.environment}",

@@ -32,8 +32,8 @@ class S3Adapter(StorageAdapter):
         )
         s3_client = boto3.client(
             "s3",
-            aws_access_key_id=access_id,
-            aws_secret_access_key=secret_key,
+            aws_access_key_id=access_id["Parameter"]["Value"],
+            aws_secret_access_key=secret_key["Parameter"]["Value"],
         )
 
         return s3_client
