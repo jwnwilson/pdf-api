@@ -1,10 +1,12 @@
 import logging
+import os
 from typing import List
 
 import boto3
 from ports.storage import StorageAdapter, StorageData, UploadUrlData
 from ports.user import UserData
 
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 logger = logging.getLogger(__name__)
 
 
@@ -17,8 +19,8 @@ class S3Adapter(StorageAdapter):
         self.user = user
 
         self.url_prefix = f"https://{self.bucket_name}.s3.amazonaws.com/"
-        self.upload_user_access_id = "/pdf-api/upload_access_id"
-        self.upload_user_secret_key = "/pdf-api/upload_secret_key"
+        self.upload_user_access_id = f"/pdf-api/upload_access_id_{ENVIRONMENT}"
+        self.upload_user_secret_key = f"/pdf-api/upload_secret_key_{ENVIRONMENT}"
 
     def _get_upload_client(self):
         client = boto3.client("ssm")
@@ -28,7 +30,8 @@ class S3Adapter(StorageAdapter):
         secret_key = client.get_parameter(
             Name=self.upload_user_secret_key, WithDecryption=True
         )
-        s3_client = boto3.client('s3',
+        s3_client = boto3.client(
+            "s3",
             aws_access_key_id=access_id,
             aws_secret_access_key=secret_key,
         )

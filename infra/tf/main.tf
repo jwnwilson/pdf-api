@@ -63,13 +63,6 @@ module "pdf_api" {
     ENVIRONMENT = var.environment
   }
 
-  ssm = {
-    parameter_names = [
-      aws_ssm_parameter.upload_access_id.name,
-      aws_ssm_parameter.upload_secret_key.name
-    ]
-  }
-
 }
 
 module "api_gateway" {
@@ -118,12 +111,6 @@ module "pdf_worker" {
   # override docker image command to run worker handler
   image_config_command = ["app.adapter.into.sqs.handler.pdf_generator_lambda_handler"]
 
-  ssm = {
-    parameter_names = [
-      aws_ssm_parameter.upload_access_id.name,
-      aws_ssm_parameter.upload_secret_key.name
-    ]
-  }
 }
 
 module "pdf_db" {
@@ -185,6 +172,17 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
         "arn:aws:dynamodb:::table/pdf_task_*",
         "arn:aws:dynamodb:eu-west-1:675468650888:table/pdf_task_*"
       ]
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "ssm:DescribeParameters",
+            "ssm:GetParameters"
+        ],
+        "Resource": [
+          "arn:aws:ssm:eu-west-1:675468650888:parameter/pdf-api/upload_access_id_${var.environment}",
+          "arn:aws:ssm:eu-west-1:675468650888:parameter/pdf-api/upload_secret_key_${var.environment}"
+        ]
     }
   ]
 }
@@ -242,7 +240,7 @@ resource "aws_s3_bucket" "pdf_storage" {
   EOF
 
   tags = {
-    Name        = "Pdf template bucket${var.environment} "
+    Name        = "Pdf template bucket ${var.environment} "
     Environment = var.environment
   }
 }
@@ -252,39 +250,38 @@ resource "aws_iam_access_key" "upload_user" {
 }
 
 resource "aws_iam_user" "upload_user" {
-  name = "upload_user"
+  name = "upload_user_${var.environment}"
   path = "/"
 }
 
 resource "aws_iam_user_policy" "upload_user_s3" {
-  name = "upload_user_s3"
+  name = "upload_user_s3_${var.environment}"
   user = aws_iam_user.upload_user.name
 
   policy = <<EOF
-  {
-    "Version": "2008-10-17",
-    "Statement": [{
-      "Sid": "AllowAccessInAWS",
-      "Effect": "Allow",
-      "Principal": { "AWS": "*" },
-      "Action": ["s3:*"],
-      "Resource": [
-        "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*",
-        "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*" 
-      ]
-    }]
-  }
-  EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [{
+    "Sid": "AllowAccessInAWS",
+    "Effect": "Allow",
+    "Action": ["s3:*"],
+    "Resource": [
+      "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*",
+      "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*" 
+    ]
+  }]
+}
+EOF
 }
 
 resource "aws_ssm_parameter" "upload_access_id" {
-  name  = "/pdf-api/upload_access_id"
+  name  = "/pdf-api/upload_access_id_${var.environment}"
   type  = "String"
   value = aws_iam_access_key.upload_user.id
 }
 
 resource "aws_ssm_parameter" "upload_secret_key" {
-  name  = "/pdf-api/upload_secret_key"
+  name  = "/pdf-api/upload_secret_key_${var.environment}"
   type  = "String"
   value = aws_iam_access_key.upload_user.secret
 }
