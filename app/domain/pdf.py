@@ -93,10 +93,12 @@ class PdfEntity(PdfBaseEntity):
         logger.info(f"Getting pdf data: {uuid}")
         # Get image files from storage
         path = f"{uuid}/"
-        files = self.template_storage_adapter.list(path)
+        file_paths = self.template_storage_adapter.list(
+            path, absolute_path=True, as_urls=True
+        )
         try:
-            html_path = [x for x in files if x.endswith("template.html")][0]
-            static_urls = [x for x in files if not x.endswith("html")]
+            html_path = [x for x in file_paths if x.endswith("template.html")][0]
+            static_urls = [x for x in file_paths if not x.endswith("html")]
         except IndexError:
             logger.error(f"Unable to find template html file for pdf: {uuid}")
             raise

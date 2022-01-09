@@ -19,7 +19,7 @@ class S3Adapter(StorageAdapter):
     def generate_path(self, storage_path: str = ""):
         return f"{self.user.user_id}/{storage_path}".replace("//", "/")
 
-    def _get_url(self, key: str) -> str:
+    def get_url(self, key: str) -> str:
         url = f"https://{self.bucket_name}.s3.amazonaws.com/"
         return url + key
 
@@ -34,7 +34,9 @@ class S3Adapter(StorageAdapter):
             upload_url=upload_data["url"], fields=upload_data["fields"]
         )
 
-    def list(self, path: str, include_files=True, include_folders=True) -> List[str]:
+    def list(
+        self, path: str, include_files=True, include_folders=True, as_urls=False
+    ) -> List[str]:
         prefix = self.generate_path(path)
         objs = self.client.list_objects_v2(
             Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"
@@ -46,7 +48,8 @@ class S3Adapter(StorageAdapter):
             results = results + [
                 obj["Prefix"] for obj in objs.get("CommonPrefixes", [])
             ]
-
+        if as_urls:
+            results = [self.get_url(r) for r in results]
         return sorted(results)
 
     def save(self, source_path: str, target_path: str) -> StorageData:
@@ -55,7 +58,7 @@ class S3Adapter(StorageAdapter):
             f"Saving file: {source_path} to s3 bucket: {self.bucket_name}, key: {target_path}"
         )
         self.bucket.upload_file(source_path, target_path)
-        return StorageData(path=self._get_url(target_path))
+        return StorageData(path=self.get_url(target_path))
 
     def load(self, source_path: str, target_path: str):
         pass
