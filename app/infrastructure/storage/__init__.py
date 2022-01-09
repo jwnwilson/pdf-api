@@ -20,7 +20,7 @@ class S3Adapter(StorageAdapter):
         self.upload_user_access_id = "/pdf-api/upload_access_id"
         self.upload_user_secret_key = "/pdf-api/upload_secret_key"
 
-    def _get_presigned_credentials(self) -> dict:
+    def _get_upload_client(self):
         client = boto3.client("ssm")
         access_id = client.get_parameter(
             Name=self.upload_user_access_id, WithDecryption=True
@@ -28,8 +28,12 @@ class S3Adapter(StorageAdapter):
         secret_key = client.get_parameter(
             Name=self.upload_user_secret_key, WithDecryption=True
         )
+        s3_client = boto3.client('s3',
+            aws_access_key_id=access_id,
+            aws_secret_access_key=secret_key,
+        )
 
-        return {"access_id": access_id, "secret_key": secret_key}
+        return s3_client
 
     def generate_key(self, storage_path: str = ""):
         return f"{self.user.user_id}/{storage_path}".replace("//", "/")
@@ -43,7 +47,7 @@ class S3Adapter(StorageAdapter):
 
     def get_public_url(self, storage_path: str) -> str:
         key = self.generate_key(storage_path)
-        public_url: str = self.client.generate_presigned_url(
+        public_url: str = self._get_upload_client().generate_presigned_url(
             "get_object",
             Params={"Bucket": self.bucket_name, "Key": key, "Expires": 3600},
         )
@@ -55,7 +59,7 @@ class S3Adapter(StorageAdapter):
 
     def upload_url(self, path: str) -> UploadUrlData:
         path = self.generate_key(path)
-        upload_data = self.client.generate_presigned_post(
+        upload_data = self._get_upload_client().generate_presigned_post(
             Bucket=self.bucket_name, Key=path, ExpiresIn=3600
         )
         return UploadUrlData(
