@@ -25,11 +25,7 @@ class S3Adapter(StorageAdapter):
 
     def get_public_url(self, key: str) -> str:
         url: str = self.client.generate_presigned_url(
-            'get_object', 
-            Params = {
-                'Bucket': self.bucket_name,
-                'Key': key
-            }
+            "get_object", Params={"Bucket": self.bucket_name, "Key": key}
         )
         return url
 
