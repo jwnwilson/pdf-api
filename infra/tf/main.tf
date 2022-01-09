@@ -163,7 +163,7 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
     {
         "Sid": "AllObjectActions",
         "Effect": "Allow",
-        "Action": "s3:*Object",
+        "Action": "s3:*",
         "Resource": [
           "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}*",
           "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*"
@@ -203,10 +203,10 @@ resource "aws_s3_bucket" "pdf_task_storage" {
   {
     "Version": "2008-10-17",
     "Statement": [{
-      "Sid": "AllowPublicRead",
+      "Sid": "AllowAccessInAWS",
       "Effect": "Allow",
       "Principal": { "AWS": "*" },
-      "Action": ["s3:GetObject"],
+      "Action": ["s3:*"],
       "Resource": ["arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*" ]
     }]
   }
@@ -226,10 +226,10 @@ resource "aws_s3_bucket" "pdf_storage" {
   {
     "Version": "2008-10-17",
     "Statement": [{
-      "Sid": "AllowPublicRead",
+      "Sid": "AllowAccessInAWS",
       "Effect": "Allow",
       "Principal": { "AWS": "*" },
-      "Action": ["s3:GetObject"],
+      "Action": ["s3:*"],
       "Resource": ["arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*" ]
     }]
   }
