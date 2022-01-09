@@ -17,7 +17,10 @@ class StorageAdapter(ABC):
     def __init__(self) -> None:
         pass
 
-    def get_url(self, str) -> str:
+    def get_url(self, key: str) -> str:
+        raise NotImplementedError
+
+    def get_public_url(self, key: str) -> str:
         raise NotImplementedError
 
     def create_folder(self, path: str):

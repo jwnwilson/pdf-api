@@ -166,7 +166,8 @@ class PdfEntity(PdfBaseEntity):
         logger.info(f"Saved PDF task: {task_id} to storage")
 
         # update task db record
-        pdf_gen_data.pdf_url = storage_data.path
+        pdf_gen_data.pdf_url = self.task_storage_adapter.get_public_url(
+            storage_data.path)
         pdf_gen_data.status = "Complete"
 
         logger.info(f"Updating PDF task: {task_id} DB record")

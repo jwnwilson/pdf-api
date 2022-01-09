@@ -116,9 +116,14 @@ module "pdf_db" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
   name     = "pdf_task_${var.environment}"
-  hash_key = "task_id"
+  hash_key = "user_id"
+  range_key = "task_id"
 
   attributes = [
+    {
+      name = "user_id"
+      type = "S"
+    },
     {
       name = "task_id"
       type = "S"
@@ -151,8 +156,8 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
         "Effect": "Allow",
         "Action": ["s3:ListBucket"],
         "Resource": [
-          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}",
-          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}"
+          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}*",
+          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*"
         ]
     },
     {
@@ -160,8 +165,8 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
         "Effect": "Allow",
         "Action": "s3:*Object",
         "Resource": [
-          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*",
-          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}/*"
+          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}*",
+          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*"
         ]
     },
     {
@@ -192,7 +197,7 @@ resource "aws_iam_role_policy_attachment" "sqs-attach-api" {
 
 resource "aws_s3_bucket" "pdf_task_storage" {
   bucket = "jwnwilson-pdf-task-${var.environment}"
-  acl    = "public-read"
+  acl    = "private"
 
   policy = <<EOF
   {
@@ -216,6 +221,19 @@ resource "aws_s3_bucket" "pdf_task_storage" {
 resource "aws_s3_bucket" "pdf_storage" {
   bucket = "jwnwilson-pdf-template-${var.environment}"
   acl    = "private"
+
+  policy = <<EOF
+  {
+    "Version": "2008-10-17",
+    "Statement": [{
+      "Sid": "AllowPublicRead",
+      "Effect": "Allow",
+      "Principal": { "AWS": "*" },
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*" ]
+    }]
+  }
+  EOF
 
   tags = {
     Name        = "Pdf template bucket${var.environment} "
