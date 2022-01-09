@@ -167,7 +167,7 @@ class PdfEntity(PdfBaseEntity):
 
         # update task db record
         pdf_gen_data.pdf_url = self.task_storage_adapter.get_public_url(
-            storage_data.path
+            pdf_storage_path
         )
         pdf_gen_data.status = "Complete"
 

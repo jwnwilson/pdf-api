@@ -15,9 +15,23 @@ class S3Adapter(StorageAdapter):
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.user = user
-        self.url_prefix = f"https://{self.bucket_name}.s3.amazonaws.com/"
 
-    def generate_path(self, storage_path: str = ""):
+        self.url_prefix = f"https://{self.bucket_name}.s3.amazonaws.com/"
+        self.upload_user_access_id = "/pdf-api/upload_access_id"
+        self.upload_user_secret_key = "/pdf-api/upload_secret_key"
+
+    def _get_presigned_credentials(self) -> dict:
+        client = boto3.client("ssm")
+        access_id = client.get_parameter(
+            Name=self.upload_user_access_id, WithDecryption=True
+        )
+        secret_key = client.get_parameter(
+            Name=self.upload_user_secret_key, WithDecryption=True
+        )
+
+        return {"access_id": access_id, "secret_key": secret_key}
+
+    def generate_key(self, storage_path: str = ""):
         return f"{self.user.user_id}/{storage_path}".replace("//", "/")
 
     def get_url(self, key: str) -> str:
@@ -27,20 +41,23 @@ class S3Adapter(StorageAdapter):
         key = url.replace(self.url_prefix, "")
         return key
 
-    def get_public_url(self, url: str) -> str:
-        key = self.get_key(url)
-        url = self.client.generate_presigned_url(
-            "get_object", Params={"Bucket": self.bucket_name, "Key": key}
+    def get_public_url(self, storage_path: str) -> str:
+        key = self.generate_key(storage_path)
+        public_url: str = self.client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": self.bucket_name, "Key": key, "Expires": 3600},
         )
-        return url
+        return public_url
 
     def create_folder(self, path):
-        path = self.generate_path(path)
+        path = self.generate_key(path)
         self.client.put_object(Bucket=self.bucket_name, Body="", Key=path)
 
     def upload_url(self, path: str) -> UploadUrlData:
-        path = self.generate_path(path)
-        upload_data = self.client.generate_presigned_post(self.bucket_name, path)
+        path = self.generate_key(path)
+        upload_data = self.client.generate_presigned_post(
+            Bucket=self.bucket_name, Key=path, ExpiresIn=3600
+        )
         return UploadUrlData(
             upload_url=upload_data["url"], fields=upload_data["fields"]
         )
@@ -48,7 +65,7 @@ class S3Adapter(StorageAdapter):
     def list(
         self, path: str, include_files=True, include_folders=True, as_urls=False
     ) -> List[str]:
-        prefix = self.generate_path(path)
+        prefix = self.generate_key(path)
         objs = self.client.list_objects_v2(
             Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"
         )
@@ -64,7 +81,7 @@ class S3Adapter(StorageAdapter):
         return sorted(results)
 
     def save(self, source_path: str, target_path: str) -> StorageData:
-        target_path = self.generate_path(target_path)
+        target_path = self.generate_key(target_path)
         logger.info(
             f"Saving file: {source_path} to s3 bucket: {self.bucket_name}, key: {target_path}"
         )
