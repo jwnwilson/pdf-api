@@ -24,9 +24,10 @@ class S3Adapter(StorageAdapter):
         return url + key
 
     def get_public_url(self, key: str) -> str:
-        return self.s3.generate_presigned_url(
+        url: str = self.s3.generate_presigned_url(
             ClientMethod="get_object", Params={"Bucket": self.bucket_name, "Key": key}
         )
+        return url
 
     def create_folder(self, path):
         path = self.generate_path(path)
