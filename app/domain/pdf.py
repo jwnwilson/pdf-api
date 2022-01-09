@@ -93,9 +93,7 @@ class PdfEntity(PdfBaseEntity):
         logger.info(f"Getting pdf data: {uuid}")
         # Get image files from storage
         path = f"{uuid}/"
-        file_paths = self.template_storage_adapter.list(
-            path, as_urls=True
-        )
+        file_paths = self.template_storage_adapter.list(path, as_urls=True)
         try:
             html_path = [x for x in file_paths if x.endswith("template.html")][0]
             static_urls = [x for x in file_paths if not x.endswith("html")]
