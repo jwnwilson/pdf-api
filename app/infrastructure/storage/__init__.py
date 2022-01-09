@@ -15,15 +15,20 @@ class S3Adapter(StorageAdapter):
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.user = user
+        self.url_prefix = f"https://{self.bucket_name}.s3.amazonaws.com/"
 
     def generate_path(self, storage_path: str = ""):
         return f"{self.user.user_id}/{storage_path}".replace("//", "/")
 
     def get_url(self, key: str) -> str:
-        url = f"https://{self.bucket_name}.s3.amazonaws.com/"
-        return url + key
+        return self.url_prefix + key
 
-    def get_public_url(self, key: str) -> str:
+    def get_key(self, url: str) -> str:
+        key = url.replace(self.url_prefix, "")
+        return key
+
+    def get_public_url(self, url: str) -> str:
+        key = self.get_key(url)
         url: str = self.client.generate_presigned_url(
             "get_object", Params={"Bucket": self.bucket_name, "Key": key}
         )

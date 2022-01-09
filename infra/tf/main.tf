@@ -152,21 +152,13 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
       "Resource": "*"
     },
     {
-        "Sid": "ListObjectsInBucket",
-        "Effect": "Allow",
-        "Action": ["s3:ListBucket"],
-        "Resource": [
-          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}*",
-          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*"
-        ]
-    },
-    {
-        "Sid": "AllObjectActions",
+        "Sid": "AllS3Actions",
         "Effect": "Allow",
         "Action": "s3:*",
         "Resource": [
-          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}*",
-          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*"
+          "arn:aws:s3:::jwnwilson-pdf-template-${var.environment}/*",
+          "arn:aws:s3:::jwnwilson-pdf-task-${var.environment}*/",
+          "*"
         ]
     },
     {
