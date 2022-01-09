@@ -94,7 +94,7 @@ class PdfEntity(PdfBaseEntity):
         # Get image files from storage
         path = f"{uuid}/"
         file_paths = self.template_storage_adapter.list(
-            path, absolute_path=True, as_urls=True
+            path, as_urls=True
         )
         try:
             html_path = [x for x in file_paths if x.endswith("template.html")][0]
