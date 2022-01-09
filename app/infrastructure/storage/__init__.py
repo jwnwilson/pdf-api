@@ -21,6 +21,7 @@ class S3Adapter(StorageAdapter):
         self.url_prefix = f"https://{self.bucket_name}.s3.amazonaws.com/"
         self.upload_user_access_id = f"/pdf-api/upload_access_id_{ENVIRONMENT}"
         self.upload_user_secret_key = f"/pdf-api/upload_secret_key_{ENVIRONMENT}"
+        self.public_url_timeout = 3600
 
     def _get_upload_client(self):
         client = boto3.client("ssm")
@@ -52,7 +53,8 @@ class S3Adapter(StorageAdapter):
         key = self.generate_key(storage_path)
         public_url: str = self._get_upload_client().generate_presigned_url(
             "get_object",
-            Params={"Bucket": self.bucket_name, "Key": key, "Expires": 3600},
+            Params={"Bucket": self.bucket_name, "Key": key},
+            ExpiresIn=self.public_url_timeout,
         )
         return public_url
 
@@ -63,7 +65,7 @@ class S3Adapter(StorageAdapter):
     def upload_url(self, path: str) -> UploadUrlData:
         path = self.generate_key(path)
         upload_data = self._get_upload_client().generate_presigned_post(
-            Bucket=self.bucket_name, Key=path, ExpiresIn=3600
+            Bucket=self.bucket_name, Key=path, ExpiresIn=self.public_url_timeout
         )
         return UploadUrlData(
             upload_url=upload_data["url"], fields=upload_data["fields"]
