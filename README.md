@@ -2,14 +2,6 @@
 
 A serverless (AWS lambda) FastAPI template intended to be extended with other microservices using SQS to communicate between services.
 
-# TODO
-
-Remaining tasks:
-- Multiple pdf generation
-  - Aggregation into one pdf
-- user / customer sortkey / s3 prefix
-- test suite
-
 # Requirements
 
 This project requires installed on your OS.
