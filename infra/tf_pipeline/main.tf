@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "jwnwilson-pdf-service"
+    bucket = "jwnwilson-authorizer"
     key = "terraform-pipeline.tfstate"
   }
 }
