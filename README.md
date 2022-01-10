@@ -112,3 +112,17 @@ The structure of this project is based on a DDD programming technique "Hexagonal
 https://medium.com/ssense-tech/hexagonal-architecture-there-are-always-two-sides-to-every-story-bc0780ed7d9c
 
 The goal is to avoid coupling logic so that it can be re-used across projects.
+
+# To Do
+
+- finish pdf generator
+  - user auth
+  - worker error handling
+  - Multipage / combine pdf support
+  - test suite - localstack
+- create email service
+- create production time aws account
+- setup:
+  - pdf service
+  - email generator
+  - aktion API in aws

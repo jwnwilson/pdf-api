@@ -8,12 +8,15 @@ from ports.db import DbAdapter
 from ports.storage import StorageAdapter
 from ports.task import TaskAdapter
 from ports.user import UserData
+from starlette.requests import Request
 
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 
-def get_current_user() -> UserData:
-    return UserData(user_id="1")
+def get_current_user(request: Request) -> UserData:
+    # attempt to get user id from authorizer logic
+    user_id = request.scope.get("aws", {}).get("context", {}).get("user_id", "1")
+    return UserData(user_id=user_id)
 
 
 def get_task_adapater(user_data: UserData = Depends(get_current_user)) -> TaskAdapter:

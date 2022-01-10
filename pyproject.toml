@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fastapi-template"
+name = "pdf-api"
 version = "0.1.0"
 description = ""
 authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
