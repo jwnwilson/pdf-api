@@ -3,6 +3,7 @@ infra/tf/.terraform
 infra/tf/infra.tfplan
 infra/tf/.terraform.lock.hcl
 infra/tf/tfapply
+infra/tf_pipeline/.terraform
 
 # python
 # Byte-compiled / optimized / DLL files
