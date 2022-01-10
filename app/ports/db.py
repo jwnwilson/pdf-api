@@ -1,4 +1,7 @@
-class DbAdapter:
+from abc import ABC
+
+
+class DbAdapter(ABC):
     def create(self, record_data):
         raise NotImplementedError
 
