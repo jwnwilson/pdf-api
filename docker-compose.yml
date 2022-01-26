@@ -24,9 +24,8 @@ services:
 
   worker:
     image: pdf-api
-    build:
-      context: .
-      dockerfile: ./infra/docker/api.dockerfile
+    depends_on:
+      - api
     tty: true
     env_file:
       - .env
