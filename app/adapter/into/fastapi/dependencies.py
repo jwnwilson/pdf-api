@@ -15,7 +15,10 @@ ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 security = HTTPBearer()
 
-def get_current_user(request: Request, credentials: HTTPBasicCredentials = Depends(security)) -> UserData:
+
+def get_current_user(
+    request: Request, credentials: HTTPBasicCredentials = Depends(security)
+) -> UserData:
     # attempt to get user id from authorizer logic
     user_id = request.scope.get("aws", {}).get("context", {}).get("user_id", "1")
     return UserData(user_id=user_id)

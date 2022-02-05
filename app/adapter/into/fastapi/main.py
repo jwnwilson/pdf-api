@@ -1,9 +1,9 @@
 import os
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 
-from .routes import pdf_generation, pdf_template
 from .dependencies import get_current_user
+from .routes import pdf_generation, pdf_template
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
@@ -17,14 +17,8 @@ app = FastAPI(
     version="0.0.1",
     root_path=root_prefix,
 )
-app.include_router(
-    pdf_template.router,
-    dependencies=PROTECTED
-)
-app.include_router(
-    pdf_generation.router,
-    dependencies=PROTECTED
-)
+app.include_router(pdf_template.router, dependencies=PROTECTED)
+app.include_router(pdf_generation.router, dependencies=PROTECTED)
 
 
 @app.get("/")
