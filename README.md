@@ -107,6 +107,11 @@ The goal is to avoid coupling logic so that it can be re-used across projects.
 
 # To Do
 
+- Fix template S3 permissions in infra
+- Add how to docs on swagger
+  - how to create new template
+  - how to upload files
+  - how to generate pdf
 - Automate user auth
   - Add dev ops var for auth lambda
   - Add authorization header to swagger docs

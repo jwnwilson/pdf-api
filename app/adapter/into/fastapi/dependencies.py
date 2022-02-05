@@ -1,6 +1,7 @@
 import os
 
 from fastapi import Depends
+from fastapi.security import HTTPBasicCredentials, HTTPBearer
 from infrastructure.db import DynamodbAdapter
 from infrastructure.sqs import SqsTaskAdapter
 from infrastructure.storage import S3Adapter
@@ -12,8 +13,9 @@ from starlette.requests import Request
 
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
+security = HTTPBearer()
 
-def get_current_user(request: Request) -> UserData:
+def get_current_user(request: Request, credentials: HTTPBasicCredentials = Depends(security)) -> UserData:
     # attempt to get user id from authorizer logic
     user_id = request.scope.get("aws", {}).get("context", {}).get("user_id", "1")
     return UserData(user_id=user_id)

@@ -72,7 +72,8 @@ module "api_gateway" {
   lambda_invoke_arn = module.pdf_api.lambda_function_invoke_arn
   lambda_name       = module.pdf_api.lambda_function_name
   domain            = "jwnwilson.co.uk"
-  api_subdomain     = "pdf-generator-${var.environment}" 
+  api_subdomain     = "pdf-generator-${var.environment}"
+  authorizer_name   = "authorizer_api_gw_${var.environment}"
 }
 
 module "queue" {
