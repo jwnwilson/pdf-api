@@ -10,6 +10,15 @@ variable "api_subdomain" {}
 
 variable "authorizer_name" {}
 
+required_providers {
+  aws = {
+    source = "hashicorp/aws"
+    # There is an issue in 3.74.0 that prevents us from deploying AWS API Gateway
+    # stages. https://github.com/hashicorp/terraform-provider-aws/issues/22866
+    version = "~> 3.73.0"
+  }
+}
+
 provider "aws" {
   alias  = "virginia"
   region = "us-east-1"
