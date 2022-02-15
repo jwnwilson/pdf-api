@@ -71,6 +71,7 @@ resource "aws_api_gateway_stage" "pdf_api" {
   stage_name    = var.environment
   cache_cluster_enabled = false
   cache_cluster_size = "0.5"
+  xray_tracing_enabled = true
 }
 
 resource "aws_api_gateway_domain_name" "pdf_api_domain_name" {

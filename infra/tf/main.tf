@@ -59,6 +59,9 @@ module "pdf_api" {
   attach_network_policy   = true
   timeout                 = 30
 
+  attach_tracing_policy   = true
+  tracing_mode            = "Active"
+
   environment_variables = {
     ENVIRONMENT = var.environment
   }
