@@ -70,7 +70,7 @@ module "pdf_api" {
   attach_tracing_policy   = true
   tracing_mode            = "Active"
 
-  provisioned_concurrent_executions = 1
+  provisioned_concurrent_executions = 10
   publish                 = true
 
   environment_variables = {
