@@ -71,6 +71,7 @@ module "pdf_api" {
   tracing_mode            = "Active"
 
   provisioned_concurrent_executions = 1
+  publish                 = true
 
   environment_variables = {
     ENVIRONMENT = var.environment
