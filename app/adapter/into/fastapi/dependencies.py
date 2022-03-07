@@ -34,14 +34,14 @@ def get_db_adapater(user_data: UserData = Depends(get_current_user)) -> DbAdapte
     return DynamodbAdapter(config={"table": table_name}, user=user_data)
 
 
-def get_task_storage_adapater(
+def get_task_storage_adapter(
     user_data: UserData = Depends(get_current_user),
 ) -> StorageAdapter:
     bucket_name = f"jwnwilson-pdf-task-{ENVIRONMENT}"
     return S3Adapter({"bucket": bucket_name}, user=user_data)
 
 
-def get_template_storage_adapater(
+def get_template_storage_adapter(
     user_data: UserData = Depends(get_current_user),
 ) -> StorageAdapter:
     bucket_name = f"jwnwilson-pdf-template-{ENVIRONMENT}"

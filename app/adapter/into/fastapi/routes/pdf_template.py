@@ -3,8 +3,8 @@ from typing import List
 
 from adapter.into.fastapi.dependencies import (
     get_db_adapater,
-    get_task_storage_adapater,
-    get_template_storage_adapater,
+    get_task_storage_adapter,
+    get_template_storage_adapter,
 )
 from fastapi import APIRouter, Depends, HTTPException
 from ports.pdf import PdfCreateInData, PdfCreateOutData, PdfUploadInData
@@ -22,8 +22,8 @@ router = APIRouter(
 
 @router.get("/")
 async def list_pdf_templates(
-    template_storage_adapter=Depends(get_template_storage_adapater),
-    task_storage_adapter=Depends(get_task_storage_adapater),
+    template_storage_adapter=Depends(get_template_storage_adapter),
+    task_storage_adapter=Depends(get_task_storage_adapter),
     db_adapter=Depends(get_db_adapater),
 ) -> List[str]:
     # call create use case
@@ -39,8 +39,8 @@ async def list_pdf_templates(
 @router.post("/")
 async def create_pdf_template(
     pdf_data: PdfCreateInData,
-    template_storage_adapter=Depends(get_template_storage_adapater),
-    task_storage_adapter=Depends(get_task_storage_adapater),
+    template_storage_adapter=Depends(get_template_storage_adapter),
+    task_storage_adapter=Depends(get_task_storage_adapter),
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
@@ -52,8 +52,8 @@ async def create_pdf_template(
 @router.post("/upload")
 async def upload_template_static(
     pdf_data: PdfUploadInData,
-    template_storage_adapter=Depends(get_template_storage_adapater),
-    task_storage_adapter=Depends(get_task_storage_adapater),
+    template_storage_adapter=Depends(get_template_storage_adapter),
+    task_storage_adapter=Depends(get_task_storage_adapter),
     db_adapter=Depends(get_db_adapater),
 ) -> PdfCreateOutData:
     # call create use case
