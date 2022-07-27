@@ -54,6 +54,10 @@ Sample json payload:
 
 # Deploying to AWS
 
+Here is a diagram showing how this projects looks in AWS.
+
+![](./docs/infra.png)
+
 Deployment is done when we merge a branch into main on github and the following is orchestrated through the .circleci/config.yml. Before the pipeline will work we require some inital pipeline setup.
 
 Before running any of the below add AWS credentials via terraform ENV Vars:
