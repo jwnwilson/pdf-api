@@ -2,9 +2,9 @@ import os
 
 from fastapi import Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBearer
-from hex_lib.adapter.out.db import DynamodbAdapter
-from hex_lib.adapter.out.queue import SqsTaskAdapter
-from hex_lib.adapter.out.storage import S3Adapter
+from hex_lib.adapter.out.db.dynamo import DynamodbAdapter
+from hex_lib.adapter.out.queue.sqs import SqsTaskAdapter
+from hex_lib.adapter.out.storage.s3 import S3Adapter
 from hex_lib.ports.db import DbAdapter
 from hex_lib.ports.storage import StorageAdapter
 from hex_lib.ports.task import TaskAdapter
