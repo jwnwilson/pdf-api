@@ -14,5 +14,7 @@ export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domai
 export CODEARTIFACT_USER=aws
 
 # Now use all of these when configuring the repo in poetry
-poetry config repositories.${REPO} $CODEARTIFACT_REPOSITORY_URL
-poetry config http-basic.${REPO} $CODEARTIFACT_USER $CODEARTIFACT_AUTH_TOKEN
+if [ -x "$(command -v poetry)" ]; then
+    poetry config repositories.${REPO} $CODEARTIFACT_REPOSITORY_URL
+    poetry config http-basic.${REPO} $CODEARTIFACT_USER $CODEARTIFACT_AUTH_TOKEN
+fi
