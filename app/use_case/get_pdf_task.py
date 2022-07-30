@@ -1,6 +1,7 @@
+from hex_lib.ports.db import DbAdapter
+from hex_lib.ports.task import TaskAdapter, TaskData
+
 from domain.task import TaskEntity
-from ports.db import DbAdapter
-from ports.task import TaskAdapter, TaskData
 
 
 def get_pdf(event_adapter: TaskAdapter, db_adapter: DbAdapter, pdf_id: str) -> TaskData:

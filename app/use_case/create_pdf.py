@@ -1,7 +1,8 @@
+from hex_lib.ports.db import DbAdapter
+from hex_lib.ports.storage import StorageAdapter
+
 from domain.pdf import PdfCreateOutData, PdfTemplateEntity
-from ports.db import DbAdapter
 from ports.pdf import PdfCreateInData
-from ports.storage import StorageAdapter
 
 
 def upload_static(

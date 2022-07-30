@@ -1,8 +1,8 @@
 import logging
 from typing import Any, List
 
-from ports.db import DbAdapter
-from ports.task import TaskAdapter, TaskArgs, TaskData
+from hex_lib.ports.db import DbAdapter
+from hex_lib.ports.task import TaskAdapter, TaskArgs, TaskData
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)

@@ -2,13 +2,13 @@ import os
 
 from fastapi import Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBearer
-from infrastructure.db import DynamodbAdapter
-from infrastructure.sqs import SqsTaskAdapter
-from infrastructure.storage import S3Adapter
-from ports.db import DbAdapter
-from ports.storage import StorageAdapter
-from ports.task import TaskAdapter
-from ports.user import UserData
+from hex_lib.adapter.out.db import DynamodbAdapter
+from hex_lib.adapter.out.queue import SqsTaskAdapter
+from hex_lib.adapter.out.storage import S3Adapter
+from hex_lib.ports.db import DbAdapter
+from hex_lib.ports.storage import StorageAdapter
+from hex_lib.ports.task import TaskAdapter
+from hex_lib.ports.user import UserData
 from starlette.requests import Request
 
 ENVIRONMENT = os.environ["ENVIRONMENT"]

@@ -1,7 +1,8 @@
+from hex_lib.ports.db import DbAdapter
+from hex_lib.ports.storage import StorageAdapter
+
 from domain.pdf import PdfEntity
-from ports.db import DbAdapter
 from ports.pdf import PdfData, PdfGenerateData
-from ports.storage import StorageAdapter
 
 
 def generate_pdf(

@@ -3,8 +3,9 @@ from typing import List
 
 from adapter.into.fastapi.dependencies import get_db_adapater, get_task_adapater
 from fastapi import APIRouter, Depends, HTTPException
+from hex_lib.ports.task import TaskArgs, TaskData
+
 from ports.pdf import PdfData, PdfGenerateDataIn
-from ports.task import TaskArgs, TaskData
 from use_case import generate_pdf_task, get_pdf_task
 
 logger = logging.getLogger(__name__)
