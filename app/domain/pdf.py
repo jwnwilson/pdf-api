@@ -5,10 +5,9 @@ from typing import List
 
 import pdfkit
 import requests
-from jinja2 import Environment, FileSystemLoader
 from hex_lib.ports.db import DbAdapter
 from hex_lib.ports.storage import StorageAdapter
-
+from jinja2 import Environment, FileSystemLoader
 from ports.pdf import (
     PdfCreateInData,
     PdfCreateOutData,

@@ -1,9 +1,8 @@
 from typing import List
 
+from domain.pdf import PdfTemplateEntity
 from hex_lib.ports.db import DbAdapter
 from hex_lib.ports.storage import StorageAdapter
-
-from domain.pdf import PdfTemplateEntity
 
 
 def list_pdf(
