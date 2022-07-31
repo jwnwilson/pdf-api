@@ -1,4 +1,5 @@
 import os
+from distutils.command import upload
 
 from fastapi import Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBearer
@@ -38,11 +39,11 @@ def get_task_storage_adapter(
     user_data: UserData = Depends(get_current_user),
 ) -> StorageAdapter:
     bucket_name = f"jwnwilson-pdf-task-{ENVIRONMENT}"
-    return S3Adapter({"bucket": bucket_name}, user=user_data)
+    return S3Adapter({"bucket": bucket_name}, user=user_data, upload_prefix="pdf-api")
 
 
 def get_template_storage_adapter(
     user_data: UserData = Depends(get_current_user),
 ) -> StorageAdapter:
     bucket_name = f"jwnwilson-pdf-template-{ENVIRONMENT}"
-    return S3Adapter({"bucket": bucket_name}, user=user_data)
+    return S3Adapter({"bucket": bucket_name}, user=user_data, upload_prefix="pdf-api")

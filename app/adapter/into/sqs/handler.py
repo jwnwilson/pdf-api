@@ -4,10 +4,10 @@ import os
 import traceback
 from typing import List
 
-from infrastructure.db import DynamodbAdapter
-from infrastructure.storage import S3Adapter
+from hex_lib.adapter.out.db.dynamo import DynamodbAdapter
+from hex_lib.adapter.out.storage.s3 import S3Adapter
+from hex_lib.ports.user import UserData
 from ports.pdf import PdfGenerateData
-from ports.user import UserData
 from use_case import generate_pdf
 
 logger = logging.getLogger(__name__)
@@ -43,10 +43,14 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
                 {"table": f"pdf_task_{ENVIRONMENT}"}, user=user
             )
             pdf_storage_adapter = S3Adapter(
-                {"bucket": f"jwnwilson-pdf-task-{ENVIRONMENT}"}, user=user
+                {"bucket": f"jwnwilson-pdf-task-{ENVIRONMENT}"},
+                user=user,
+                upload_prefix="pdf-api",
             )
             template_storage_adapter = S3Adapter(
-                {"bucket": f"jwnwilson-pdf-template-{ENVIRONMENT}"}, user=user
+                {"bucket": f"jwnwilson-pdf-template-{ENVIRONMENT}"},
+                user=user,
+                upload_prefix="pdf-api",
             )
             task_data = generate_pdf.generate_pdf(
                 db_adapter, template_storage_adapter, pdf_storage_adapter, pdf_data
