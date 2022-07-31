@@ -40,7 +40,10 @@ def pdf_generator_lambda_handler(event, context) -> List[PdfGenerateData]:
 
             logger.info(f"PDF id:{pdf_data.pdf_id} parsed from SQS, generating PDF")
             db_adapter = DynamodbAdapter(
-                {"table": f"pdf_task_{ENVIRONMENT}"}, user=user
+                {"table": f"pdf_task_{ENVIRONMENT}"},
+                user=user,
+                part_key_name="user_id",
+                sort_key_name="task_id",
             )
             pdf_storage_adapter = S3Adapter(
                 {"bucket": f"jwnwilson-pdf-task-{ENVIRONMENT}"},

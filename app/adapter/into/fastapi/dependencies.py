@@ -32,7 +32,12 @@ def get_task_adapater(user_data: UserData = Depends(get_current_user)) -> TaskAd
 
 def get_db_adapater(user_data: UserData = Depends(get_current_user)) -> DbAdapter:
     table_name = f"pdf_task_{ENVIRONMENT}"
-    return DynamodbAdapter(config={"table": table_name}, user=user_data)
+    return DynamodbAdapter(
+        config={"table": table_name},
+        user=user_data,
+        part_key_name="user_id",
+        sort_key_name="task_id",
+    )
 
 
 def get_task_storage_adapter(
