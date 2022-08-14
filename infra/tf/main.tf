@@ -7,9 +7,6 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      # There is an issue in 3.74.0 that prevents us from deploying AWS API Gateway
-      # stages. https://github.com/hashicorp/terraform-provider-aws/issues/22866
-      # version = "~> 3.73.0"
     }
   }
 }
