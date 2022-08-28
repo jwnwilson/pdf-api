@@ -510,7 +510,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "hex-lib"
-version = "0.1.8"
+version = "0.1.9"
 description = ""
 category = "main"
 optional = false
@@ -891,7 +891,7 @@ standard = ["httptools (>=0.2.0,<0.4.0)", "watchgod (>=0.6)", "python-dotenv (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "63fda55490ad12fb876b35d807c4cc0f98b9dab820dc3caee5f3b5e44e156fda"
+content-hash = "8ebf0cd619ff4f2ec384f4ace0557e0da9a1f60e848400592736756d57d197aa"
 
 [metadata.files]
 anyio = [
@@ -975,8 +975,8 @@ h11 = [
     {file = "h11-0.13.0.tar.gz", hash = "sha256:70813c1135087a248a4d38cc0e1a0181ffab2188141a93eaf567940c3957ff06"},
 ]
 hex-lib = [
-    {file = "hex-lib-0.1.8.tar.gz", hash = "sha256:de1bc7bd19fa96a0e698111b55341a6c902140660cee9aaa763e16af823d4259"},
-    {file = "hex_lib-0.1.8-py3-none-any.whl", hash = "sha256:952ac9917dc37cf353581300b03d18ddbd97fdee76d10fc4a93e7fea21d3ab39"},
+    {file = "hex-lib-0.1.9.tar.gz", hash = "sha256:34e0ae8b9a247d5ae841d4f1d11412239160118500881f303775502224f12a00"},
+    {file = "hex_lib-0.1.9-py3-none-any.whl", hash = "sha256:83deb47b87eea3f018755d88fd3a76b47178401e7b65695d1d47caa770d740a0"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
